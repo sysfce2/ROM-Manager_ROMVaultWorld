@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using RomVaultCore;
+using RVUtils;
 using RomVaultCore.RvDB;
 
 namespace ROMVault

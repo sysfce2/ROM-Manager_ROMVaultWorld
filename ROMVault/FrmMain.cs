@@ -4,50 +4,30 @@
  *     Copyright 2024                                 *
  ******************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection;
-using System.Windows.Forms;
+using DATReader.DatStore;
+using DATReader.DatWriter;
+using Extensions;
 using RomVaultCore;
 using RomVaultCore.FindFix;
 using RomVaultCore.ReadDat;
 using RomVaultCore.RvDB;
 using RomVaultCore.Scanner;
-using RVIO;
-using DATReader.DatStore;
-using DATReader.DatWriter;
 using RomVaultCore.Utils;
+using RVIO;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Reflection;
 using System.Threading;
+using System.Windows.Forms;
 using MethodInvoker = System.Windows.Forms.MethodInvoker;
-using Extensions;
 
 namespace ROMVault
 {
     public partial class FrmMain : Form
     {
-        private static readonly Color CBlue = Color.FromArgb(214, 214, 255);
-        private static readonly Color CGreyBlue = Color.FromArgb(214, 224, 255);
-        private static readonly Color CRed = Color.FromArgb(255, 214, 214);
-        private static readonly Color CBrightRed = Color.FromArgb(255, 0, 0);
-        private static readonly Color CGreen = Color.FromArgb(214, 255, 214);
-        private static readonly Color CNeonGreen = Color.FromArgb(100, 255, 100);
-        private static readonly Color CLightRed = Color.FromArgb(255, 235, 235);
-        private static readonly Color CSoftGreen = Color.FromArgb(150, 200, 150);
-        private static readonly Color CGrey = Color.FromArgb(214, 214, 214);
-        private static readonly Color CCyan = Color.FromArgb(214, 255, 255);
-        private static readonly Color CCyanGrey = Color.FromArgb(214, 225, 225);
-        private static readonly Color CMagenta = Color.FromArgb(255, 214, 255);
-        private static readonly Color CBrown = Color.FromArgb(140, 80, 80);
-        private static readonly Color CPurple = Color.FromArgb(214, 140, 214);
-        private static readonly Color CYellow = Color.FromArgb(255, 255, 214);
-        private static readonly Color CDarkYellow = Color.FromArgb(255, 255, 100);
-        private static readonly Color COrange = Color.FromArgb(255, 214, 140);
-        private static readonly Color CWhite = Color.FromArgb(255, 255, 255);
-        private static int[] _gameGridColumnXPositions;
 
-        private readonly Color[] _displayColor;
-        private readonly Color[] _fontColor;
 
         private readonly ContextMenuStrip _mnuContext;
         private readonly ContextMenuStrip _mnuContextToSort;
@@ -65,7 +45,6 @@ namespace ROMVault
 
         private RvFile _clickedTree;
 
-        private bool _updatingGameGrid;
 
         private FrmKey _fk;
 
@@ -115,65 +94,17 @@ namespace ROMVault
             btnDefault3.BackgroundImage = rvImages.GetBitmap("default3");
             btnDefault4.BackgroundImage = rvImages.GetBitmap("default4");
 
-            AddGameMetaData();
+            ucGameInfo.AddGameMetaData();
             txtDefault = $@"RomVault ({Program.strVersion}) {Application.StartupPath}";
             settext("");
             MIA.stme = settext;
 
-            Type dgvType = GameGrid.GetType();
-            PropertyInfo pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
-            pi.SetValue(GameGrid, true, null);
-
+            /*
             dgvType = RomGrid.GetType();
             pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
             pi.SetValue(RomGrid, true, null);
+            */
 
-
-            _displayColor = new Color[(int)RepStatus.EndValue];
-            _fontColor = new Color[(int)RepStatus.EndValue];
-
-            // RepStatus.UnSet
-
-            _displayColor[(int)RepStatus.UnScanned] = CBlue;
-
-            _displayColor[(int)RepStatus.DirCorrect] = CGreen;
-            _displayColor[(int)RepStatus.DirMissing] = CRed;
-            _displayColor[(int)RepStatus.DirCorrupt] = CBrightRed; //BrightRed
-
-            _displayColor[(int)RepStatus.Missing] = CRed;
-            _displayColor[(int)RepStatus.MissingNew] = CSoftGreen;
-            _displayColor[(int)RepStatus.Correct] = CGreen;
-            _displayColor[(int)RepStatus.CorrectMIA] = CNeonGreen;
-            _displayColor[(int)RepStatus.NotCollected] = CGrey;
-            _displayColor[(int)RepStatus.UnNeeded] = CCyanGrey;
-            _displayColor[(int)RepStatus.Unknown] = CCyan;
-            _displayColor[(int)RepStatus.InToSort] = CMagenta;
-
-            _displayColor[(int)RepStatus.MissingMIA] = CSoftGreen;
-
-            _displayColor[(int)RepStatus.Corrupt] = CBrightRed; //BrightRed
-            _displayColor[(int)RepStatus.Ignore] = CGreyBlue;
-
-            _displayColor[(int)RepStatus.CanBeFixed] = CYellow;
-            _displayColor[(int)RepStatus.CanBeFixedMIA] = CDarkYellow;
-            _displayColor[(int)RepStatus.MoveToSort] = CPurple;
-            _displayColor[(int)RepStatus.Delete] = CBrown;
-            _displayColor[(int)RepStatus.NeededForFix] = COrange;
-            _displayColor[(int)RepStatus.Rename] = COrange;
-
-            _displayColor[(int)RepStatus.CorruptCanBeFixed] = CYellow;
-            _displayColor[(int)RepStatus.MoveToCorrupt] = CPurple; //Missing
-
-            _displayColor[(int)RepStatus.Incomplete] = CLightRed;
-
-            _displayColor[(int)RepStatus.Deleted] = CWhite;
-
-            for (int i = 0; i < (int)RepStatus.EndValue; i++)
-            {
-                _fontColor[i] = Contrasty(_displayColor[i]);
-            }
-
-            _gameGridColumnXPositions = new int[(int)RepStatus.EndValue];
 
             ctrRvTree.Setup(ref DB.DirRoot);
 
@@ -378,9 +309,13 @@ namespace ROMVault
             if (Settings.rvSettings.Darkness)
             {
                 Dark.dark.SetColors(this);
-                SetTextBoxHeight(gbDatInfo);
-                SetTextBoxHeight(gbSetInfo);
+                SetTextBoxHeight(ucDatInfo);
+                SetTextBoxHeight(ucGameInfo);
             }
+
+            grdGame.updateGameInfo += UpdateGameGrid;
+            grdGame.updateDatInfo += UpdateDatInfoUpdate;
+            grdGame.MenuClick += OpenMenu;
         }
 
         /*
@@ -411,13 +346,6 @@ namespace ROMVault
             }
         }
 
-        // returns either white or black, depending of quick luminance of the Color " a "
-        // called when the _displayColor is finished, in order to populate the _fontColor table.
-        private static Color Contrasty(Color a)
-        {
-            return (a.R << 1) + a.B + a.G + (a.G << 2) < 1024 ? Color.White : Color.Black;
-        }
-
         public sealed override string Text
         {
             get => base.Text;
@@ -430,7 +358,7 @@ namespace ROMVault
             if (splitDatInfoTree.Panel1.Width == 0)
                 return;
 
-            gbDatInfo.Width = splitDatInfoTree.Panel1.Width - gbDatInfo.Left * 2;
+            ucDatInfo.Width = splitDatInfoTree.Panel1.Width - ucDatInfo.Left * 2;
         }
 
         private void splitContainer4_Panel1_Resize(object sender, EventArgs e)
@@ -452,7 +380,7 @@ namespace ROMVault
             txtFilter.Left = chkLeft;
             btnClear.Left = chkLeft + txtFilter.Width + 2;
 
-            gbSetInfo.Width = chkLeft - gbSetInfo.Left - 10;
+            ucGameInfo.Width = chkLeft - ucGameInfo.Left - 10;
         }
         protected override void ScaleControl(SizeF factor, BoundsSpecified specified)
         {
@@ -466,6 +394,9 @@ namespace ROMVault
 
             _scaleFactorX *= factor.Width;
             _scaleFactorY *= factor.Height;
+
+            ucDatInfo.SetScaleFactor(factor);
+            ucGameInfo.SetScaleFactor(factor);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -493,7 +424,7 @@ namespace ROMVault
 
             if (e.Button != MouseButtons.Right)
             {
-                if (cf != gameGridSource)
+                if (cf != grdGame.gameGridSource)
                 {
                     DatSetSelected(cf);
                 }
@@ -1074,13 +1005,17 @@ namespace ROMVault
         private void BtnClear_Click(object sender, EventArgs e)
         {
             txtFilter.Text = "";
+            grdGame.FilterText = "";
+            if (grdGame.gameGridSource != null)
+                grdGame.UpdateGameGrid(grdGame.gameGridSource);
         }
 
 
         private void TxtFilter_TextChanged(object sender, EventArgs e)
         {
-            if (gameGridSource != null)
-                UpdateGameGrid(gameGridSource);
+            grdGame.FilterText = txtFilter.Text;
+            if (grdGame.gameGridSource != null)
+                grdGame.UpdateGameGrid(grdGame.gameGridSource);
             txtFilter.Focus();
         }
 
@@ -1275,10 +1210,10 @@ namespace ROMVault
         {
 
             ctrRvTree.Refresh();
-            UpdateGameGrid(true);
+            grdGame.UpdateGameGrid(true);
             if (ctrRvTree.Selected != null)
-                UpdateDatMetaData(ctrRvTree.Selected);
-            GameGrid.Refresh();
+                ucDatInfo.UpdateDatMetaData(ctrRvTree.Selected);
+            grdGame.Refresh();
         }
 
 
@@ -1291,113 +1226,17 @@ namespace ROMVault
         {
             ctrRvTree.Refresh();
 
-            ClearGameGrid();
+            grdGame.ClearGameGrid();
 
             if (cf == null)
             {
                 return;
             }
 
-            UpdateDatMetaData(cf);
-            UpdateGameGrid(cf);
-        }
-        private void UpdateDatMetaData(RvFile tDir)
-        {
-            lblDITName.Text = tDir.Name;
-
-
-            RvDat tDat = null;
-            if (tDir.Dat != null)
-                tDat = tDir.Dat;
-            else if (tDir.DirDatCount == 1)
-                tDat = tDir.DirDat(0);
-
-            if (tDat != null)
-            {
-                if (lblDITName.Text != tDat.GetData(RvDat.DatData.DatName))
-                    lblDITName.Text += $":  {tDat.GetData(RvDat.DatData.DatName)}";
-
-                string DatId = tDat.GetData(RvDat.DatData.Id);
-                if (!string.IsNullOrWhiteSpace(DatId))
-                    lblDITName.Text += $" (ID:{DatId})";
-
-
-                lblDITDescription.Text = tDat.GetData(RvDat.DatData.Description);
-                lblDITCategory.Text = tDat.GetData(RvDat.DatData.Category);
-                lblDITVersion.Text = tDat.GetData(RvDat.DatData.Version);
-                lblDITAuthor.Text = tDat.GetData(RvDat.DatData.Author);
-                lblDITDate.Text = tDat.GetData(RvDat.DatData.Date);
-                string header = tDat.GetData(RvDat.DatData.Header);
-                if (!string.IsNullOrWhiteSpace(header))
-                    lblDITName.Text += " (" + header + ")";
-
-            }
-            else
-            {
-                lblDITDescription.Text = "";
-                lblDITCategory.Text = "";
-                lblDITVersion.Text = "";
-                lblDITAuthor.Text = "";
-                lblDITDate.Text = "";
-            }
-
-            lblDITPath.Text = tDir.FullName;
-
-            lblDITRomsGot.Text = tDir.DirStatus.CountCorrect().ToRvString();
-            if (tDir.DirStatus.CountFoundMIA() > 0) { lblDITRomsGot.Text += $"  -  {tDir.DirStatus.CountFoundMIA().ToRvString()} Found MIA"; }
-            lblDITRomsMissing.Text = tDir.DirStatus.CountMissing().ToRvString();
-            if (tDir.DirStatus.CountMIA() > 0) { lblDITRomsMissing.Text += $"  -  {tDir.DirStatus.CountMIA().ToRvString()} MIA"; }
-            lblDITRomsFixable.Text = tDir.DirStatus.CountFixesNeeded().ToRvString();
-            lblDITRomsUnknown.Text = (tDir.DirStatus.CountUnknown() + tDir.DirStatus.CountInToSort()).ToRvString();
+            ucDatInfo.UpdateDatMetaData(cf);
+            grdGame.UpdateGameGrid(cf);
         }
 
-
-        private void gbDatInfo_Resize(object sender, EventArgs e)
-        {
-            const int leftPos = 89;
-            int rightPos = (int)(gbDatInfo.Width / _scaleFactorX) - 15;
-
-
-            int width = rightPos - leftPos;
-            int widthB1 = (int)((double)width * 120 / 340);
-            int leftB2 = rightPos - widthB1;
-
-
-            int backD = 97;
-
-            width = (int)(width * _scaleFactorX);
-            widthB1 = (int)(widthB1 * _scaleFactorX);
-            leftB2 = (int)(leftB2 * _scaleFactorX);
-            backD = (int)(backD * _scaleFactorX);
-
-
-            lblDITName.Width = width;
-            lblDITDescription.Width = width;
-
-            lblDITCategory.Width = widthB1;
-            lblDITAuthor.Width = widthB1;
-
-            lblDIVersion.Left = leftB2 - backD;
-            lblDIDate.Left = leftB2 - backD;
-
-            lblDITVersion.Left = leftB2;
-            lblDITVersion.Width = widthB1;
-            lblDITDate.Left = leftB2;
-            lblDITDate.Width = widthB1;
-
-            lblDITPath.Width = width;
-
-            lblDITRomsGot.Width = widthB1;
-            lblDITRomsMissing.Width = widthB1;
-
-            lblDIRomsFixable.Left = leftB2 - backD;
-            lblDIRomsUnknown.Left = leftB2 - backD;
-
-            lblDITRomsFixable.Left = leftB2;
-            lblDITRomsFixable.Width = widthB1;
-            lblDITRomsUnknown.Left = leftB2;
-            lblDITRomsUnknown.Width = widthB1;
-        }
 
 
         #endregion
@@ -1497,6 +1336,380 @@ namespace ROMVault
             }
             DatSetSelected(ctrRvTree.Selected);
         }
+
+
+        private void ReadDefaults()
+        {
+            defaults defaults = defaults.ReadDefaults();
+            if (defaults != null)
+            {
+                if (defaults.mainX > -30000 && defaults.mainY > -30000 && defaults.mainHeight > 50)
+                {
+                    this.StartPosition = FormStartPosition.Manual;
+                    this.Location = new Point(defaults.mainX, defaults.mainY);
+                    this.Size = new Size(defaults.mainWidth, defaults.mainHeight);
+                }
+
+                if (defaults.splitDatInfoGameInfo_pos != int.MinValue) this.splitDatInfoGameInfo.SplitterDistance = defaults.splitDatInfoGameInfo_pos;
+                if (defaults.splitGameListRomList_pos != int.MinValue) this.splitGameListRomList.SplitterDistance = defaults.splitGameListRomList_pos;
+                if (defaults.splitListArt_pos != int.MinValue) this.splitListArt.SplitterDistance = defaults.splitListArt_pos;
+                if (defaults.nfo_FontSize != int.MinValue) trbFontSize.Value = defaults.nfo_FontSize;
+
+                grdGame.SetDefaults(defaults);
+                grdRom.SetDefaults(defaults);
+            }
+        }
+
+
+        private void WriteDefaults()
+        {
+            defaults df = new defaults();
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                df.mainX = this.RestoreBounds.X;
+                df.mainY = this.RestoreBounds.Y;
+                df.mainWidth = this.RestoreBounds.Width;
+                df.mainHeight = this.RestoreBounds.Height;
+            }
+            else
+            {
+                df.mainX = this.Location.X;
+                df.mainY = this.Location.Y;
+                df.mainWidth = this.Size.Width;
+                df.mainHeight = this.Size.Height;
+            }
+
+            df.splitDatInfoGameInfo_pos = this.splitDatInfoGameInfo.SplitterDistance;
+            df.splitGameListRomList_pos = this.splitGameListRomList.SplitterDistance;
+            df.splitListArt_pos = this.splitListArt.SplitterDistance;
+            df.nfo_FontSize = trbFontSize.Value;
+
+            grdGame.PutDefaults(df);
+            grdRom.PutDefaults(df);
+
+            defaults.WriteDefaults(df);
+        }
+
+        #region gamegridMenu
+
+
+
+        private ContextMenuStrip _mnuGameGrid;
+
+        ToolStripMenuItem mnuGameScan1;
+        ToolStripMenuItem mnuGameScan2;
+        ToolStripMenuItem mnuGameScan3;
+        ToolStripMenuItem mnuOpenDir;
+        ToolStripMenuItem mnuOpenParentDir;
+        ToolStripMenuItem mnuDir2Dat;
+        ToolStripMenuItem mnuLaunchEmulator;
+
+        private void InitGameGridMenu()
+        {
+            _mnuGameGrid = new ContextMenuStrip();
+
+
+            mnuGameScan1 = new ToolStripMenuItem
+            {
+                Text = @"Scan Quick (Headers Only)",
+                Tag = EScanLevel.Level1
+            };
+            mnuGameScan2 = new ToolStripMenuItem
+            {
+                Text = @"Scan",
+                Tag = EScanLevel.Level2
+            };
+            mnuGameScan3 = new ToolStripMenuItem
+            {
+                Text = @"Scan Full (Complete Re-Scan)",
+                Tag = EScanLevel.Level3
+            };
+
+            mnuGameScan1.Click += MnuGameScan;
+            mnuGameScan2.Click += MnuGameScan;
+            mnuGameScan3.Click += MnuGameScan;
+
+
+            mnuOpenDir = new ToolStripMenuItem
+            {
+                Text = @"Open Dir",
+                Tag = null
+            };
+            mnuOpenDir.Click += MnuOpenDir;
+
+            mnuOpenParentDir = new ToolStripMenuItem
+            {
+                Text = @"Open Parent",
+                Tag = null
+            };
+            mnuOpenParentDir.Click += MnuOpenParentDir;
+
+
+            mnuDir2Dat = new ToolStripMenuItem
+            {
+                Text = @"Dir2Dat",
+                Tag = null
+            };
+            mnuDir2Dat.Click += MnuDir2Dat;
+
+            mnuLaunchEmulator = new ToolStripMenuItem
+            {
+                Text = @"Launch emulator",
+                Tag = null
+            };
+            mnuLaunchEmulator.Click += LaunchEmulator;
+
+        }
+
+
+        public void UpdateGameGrid(RvFile tGame, bool onTimer)
+        {
+            ucGameInfo.UpdateGameMetaData(tGame);
+            UpdateSidePannel(tGame);
+            grdRom.UpdateRomGrid(tGame, onTimer);
+        }
+
+        public void UpdateDatInfoUpdate(RvFile tGame)
+        {
+            ctrRvTree.SetSelected(tGame);
+            ucDatInfo.UpdateDatMetaData(tGame);
+        }
+
+
+        private void UpdateSidePannel(RvFile tGame)
+        {
+
+            if (tGame?.Game != null)
+            {
+
+                bool found = false;
+                string path = tGame.Parent.DatTreeFullName;
+                foreach (EmulatorInfo ei in Settings.rvSettings.EInfo)
+                {
+                    if (path.Length <= 8)
+                        continue;
+
+                    if (!string.Equals(path.Substring(8), ei.TreeDir, StringComparison.CurrentCultureIgnoreCase))
+                        continue;
+
+                    if (string.IsNullOrWhiteSpace(ei.ExtraPath))
+                        continue;
+
+                    if (ei.ExtraPath != null)
+                    {
+                        found = true;
+                        if (ei.ExtraPath.Substring(0, 1) == "%")
+                            LoadMameSLPannels(tGame, ei.ExtraPath.Substring(1));
+                        else
+                            LoadMamePannels(tGame, ei.ExtraPath);
+
+                        break;
+                    }
+                }
+
+                if (!found)
+                    found = LoadNFOPannel(tGame);
+
+                if (!found)
+                    found = LoadC64Pannel(tGame);
+
+                if (!found)
+                    HidePannel();
+
+            }
+
+            else
+            {
+                HidePannel();
+            }
+        }
+
+
+        private void MnuGameScan(object sender, EventArgs e)
+        {
+            if (_working)
+                return;
+            RvFile thisFile = (RvFile)_mnuGameGrid.Tag;
+            ScanRoms((EScanLevel)((ToolStripMenuItem)sender).Tag, thisFile);
+        }
+
+        private void MnuOpenDir(object sender, EventArgs e)
+        {
+            RvFile thisFile = (RvFile)_mnuGameGrid.Tag;
+            if (thisFile.FileType == FileType.Dir)
+            {
+                RVProcess.StartDIR(thisFile.FullNameCase);
+                return;
+            }
+            if (thisFile.FileType == FileType.Zip || thisFile.FileType == FileType.SevenZip)
+            {
+                string zipPath = thisFile.FullNameCase;
+                if (File.Exists(zipPath))
+                {
+                    RVProcess.StartURL(zipPath);
+                }
+                return;
+            }
+        }
+
+        private void MnuOpenParentDir(object sender, EventArgs e)
+        {
+            RvFile thisFile = (RvFile)_mnuGameGrid.Tag;
+            thisFile = thisFile.Parent;
+            if (thisFile == null)
+                return;
+            if (thisFile.FileType == FileType.Dir)
+            {
+                RVProcess.StartDIR(thisFile.FullNameCase);
+                return;
+            }
+        }
+
+
+        frmDir2Dat d2d = null;
+
+        private void MnuDir2Dat(object sender, EventArgs e)
+        {
+            if (d2d == null)
+                d2d = new frmDir2Dat();
+
+            d2d.PopulateFrom((RvFile)_mnuGameGrid.Tag);
+            d2d.ShowDialog();
+        }
+
+
+
+
+        private void LaunchEmulator(object sender, EventArgs e)
+        {
+            RvFile tGame = _mnuGameGrid.Tag as RvFile;
+            if (tGame != null)
+                LaunchEmulator(tGame);
+        }
+        private EmulatorInfo FindEmulatorInfo(RvFile tGame)
+        {
+            string path = tGame.Parent.DatTreeFullName;
+            if (Settings.rvSettings?.EInfo == null)
+                return null;
+            if (path == "Error")
+                return null;
+            if (path.Length <= 8)
+                return null;
+
+            foreach (EmulatorInfo ei in Settings.rvSettings.EInfo)
+            {
+                if (!string.Equals(path.Substring(8), ei.TreeDir, StringComparison.CurrentCultureIgnoreCase))
+                    continue;
+
+                if (string.IsNullOrWhiteSpace(ei.CommandLine))
+                    continue;
+
+                if (!File.Exists(ei.ExeName))
+                    continue;
+                return ei;
+            }
+            return null;
+        }
+
+        private void LaunchEmulator(RvFile tGame)
+        {
+            EmulatorInfo ei = FindEmulatorInfo(tGame);
+            if (ei == null)
+                return;
+
+            string commandLineOptions = ei.CommandLine;
+            string dirname = tGame.Parent.FullName;
+            if (dirname.StartsWith("RomRoot\\"))
+                dirname = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), dirname);
+
+            commandLineOptions = commandLineOptions.Replace("{gamename}", Path.GetFileNameWithoutExtension(tGame.Name));
+            commandLineOptions = commandLineOptions.Replace("{gamefilename}", tGame.Name);
+            commandLineOptions = commandLineOptions.Replace("{gamedirectory}", dirname);
+
+            string workingDir = ei.WorkingDirectory;
+            if (string.IsNullOrWhiteSpace(workingDir))
+                workingDir = Path.GetDirectoryName(ei.ExeName);
+
+            using (Process exeProcess = new Process())
+            {
+                exeProcess.StartInfo.WorkingDirectory = workingDir;
+                exeProcess.StartInfo.FileName = ei.ExeName;
+                exeProcess.StartInfo.Arguments = commandLineOptions;
+                exeProcess.StartInfo.UseShellExecute = false;
+                exeProcess.StartInfo.CreateNoWindow = true;
+                exeProcess.Start();
+            }
+        }
+
+        public void OpenMenu(RvFile thisGame, MouseEventArgs e)
+        {
+            Point controLocation = ControlLoc(grdGame);
+            _mnuGameGrid.Items.Clear();
+
+            var item = new ToolStripSeparator();
+            if (thisGame.FileType == FileType.Dir && !_working)
+            {
+                _mnuGameGrid.Items.Add(mnuGameScan2);
+                _mnuGameGrid.Items.Add(mnuGameScan1);
+                _mnuGameGrid.Items.Add(mnuGameScan3);
+                _mnuGameGrid.Items.Insert(3, item);
+            }
+
+            bool found = false;
+            if (thisGame.FileType == FileType.Dir)
+            {
+                if ((Settings.rvSettings.Permissions & 4) == 4)
+                    _mnuGameGrid.Items.Add(mnuDir2Dat);
+
+                string folderPath = thisGame.FullNameCase;
+                if (Directory.Exists(folderPath))
+                {
+                    found = true;
+                    mnuOpenDir.Text = "Open Dir";
+                    _mnuGameGrid.Items.Add(mnuOpenDir);
+                }
+            }
+
+            if (thisGame.FileType == FileType.Zip || thisGame.FileType == FileType.SevenZip)
+            {
+                string zipPath = thisGame.FullNameCase;
+                if (File.Exists(zipPath))
+                {
+                    found = true;
+                    if (thisGame.FileType == FileType.Zip)
+                        mnuOpenDir.Text = "Open Zip";
+
+                    if (thisGame.FileType == FileType.SevenZip)
+                        mnuOpenDir.Text = "Open 7Zip";
+                    _mnuGameGrid.Items.Add(mnuOpenDir);
+                }
+            }
+
+            {
+                string parentPath = thisGame.Parent.FullName;
+                if (Directory.Exists(parentPath))
+                {
+                    found = true;
+                    mnuOpenParentDir.Text = "Open Parent";
+                    _mnuGameGrid.Items.Add(mnuOpenParentDir);
+                }
+            }
+
+            if (FindEmulatorInfo(thisGame) != null && found)
+                _mnuGameGrid.Items.Add(mnuLaunchEmulator);
+
+            if (_mnuGameGrid.Items.Count == 0)
+                return;
+
+            if (_mnuGameGrid.Items[_mnuGameGrid.Items.Count - 1] == item)
+                _mnuGameGrid.Items.RemoveAt(_mnuGameGrid.Items.Count - 1);
+
+            _mnuGameGrid.Tag = thisGame;
+            _mnuGameGrid.Show(this, new Point(controLocation.X + e.X - 32, controLocation.Y + e.Y - 10));
+
+        }
+
+        #endregion
 
     }
 }

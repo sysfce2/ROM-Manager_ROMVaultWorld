@@ -8,22 +8,29 @@
     <AssemblyName>ROMVault38</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <NoWarn>$(NoWarn);WFO1000;CA1416</NoWarn>
-    <Configurations>Debug;Release;PrivateDebug</Configurations>
+    <Configurations>Debug;Release;</Configurations>
     <ApplicationIcon>chip.ico</ApplicationIcon>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <BaseOutputPath>D:\stage\RomVault\</BaseOutputPath>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
   </PropertyGroup>
-
+	
   <ItemGroup>
     <Content Include="chip.ico" />
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Dark\Dark.csproj" />
-    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+	<ProjectReference Include="..\Dark\Dark.csproj" />
 	<ProjectReference Include="..\RomVaultCore\RomVaultCore.csproj" />
-    <ProjectReference Include="..\SAM\TrrntZipUICore\TrrntZipUICore.csproj" />
+	<ProjectReference Include="..\SAM\TrrntZipUICore\TrrntZipUICore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DefineConstants.Contains(`external`))' == 'true'">
+	<ProjectReference Include="..\..\RVWorldPrivate\ExtensionsDV\ExtensionsDV.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DefineConstants.Contains(`external`))' != 'true'">
+	<ProjectReference Include="..\Extensions\Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,7 +49,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>rvImages1.resx</DependentUpon>
     </Compile>
-    <Compile Update="rvTree.Designer.cs">
+    <Compile Update="UIElements\rvTree.Designer.cs">
         <DependentUpon>rvTree.cs</DependentUpon>
     </Compile>
   </ItemGroup>

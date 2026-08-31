@@ -1,0 +1,38 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/CHD/">
+    <Project Path="CHD/CHDSharpLib/CHDSharpLib.csproj" />
+  </Folder>
+  <Folder Name="/DAT/">
+    <Project Path="DAT/DATReader/DATReader.csproj" />
+  </Folder>
+  <Folder Name="/Libraries/">
+    <Project Path="Libraries/CodePage/CodePage.csproj" />
+    <Project Path="Libraries/RVIO/RVIO.csproj" />
+    <Project Path="Libraries/RVUtils/RVUtils.csproj" />
+    <Project Path="Libraries/RVZstdSharp/RVZstdSharp.csproj" />
+    <Project Path="Libraries/SortMethods/SortMethods.csproj" />
+    <Project Path="Libraries/StorageList/StorageList.csproj" />
+  </Folder>
+  <Folder Name="/SAM/">
+    <Project Path="SAM/TrrntZip/TrrntZip.csproj" />
+    <Project Path="SAM/TrrntZipCMD/TrrntZipCMD.csproj" />
+    <Project Path="SAM/TrrntZipUI/TrrntZipUI.csproj" />
+    <Project Path="SAM/TrrntZipUICore/TrrntZipUICore.csproj" />
+  </Folder>
+  <Folder Name="/SupportApps/">
+    <Project Path="SupportApps/RVUnZip/RVUnZip.csproj" />
+  </Folder>
+  <Project Path="Compress/Compress.csproj" />
+  <Project Path="Dark/Dark.csproj" Id="80b6f476-6144-40cf-804a-593d429bd874" />
+  <Project Path="Extensions/Extensions.csproj" />
+  <Project Path="FileScanner/FileScanner.csproj" />
+  <Project Path="ROMVault/ROMVault.csproj" />
+  <Project Path="RomVaultCmd/RomVaultCmd.csproj" />
+  <Project Path="RomVaultCore/RomVaultCore.csproj" />
+  <Project Path="SharedEnum/SharedEnum.csproj" />
+</Solution>

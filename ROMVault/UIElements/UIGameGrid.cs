@@ -1,21 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Text;
-using System.Windows.Forms;
-using Compress;
+﻿using Compress;
 using Compress.StructuredZip;
 using RomVaultCore;
 using RomVaultCore.RvDB;
 using RVIO;
+using RVUtils;
 using StorageList;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Text;
+using System.Reflection;
+using System.Windows.Forms;
 
-namespace ROMVault
+namespace ROMVault.UIElements
 {
+    public delegate void UpdateGameInfo(RvFile tGame,bool onTimer);
+    public delegate void PassBackRvFile(RvFile tGame);
+    public delegate void OpenMEnu(RvFile tGame, MouseEventArgs e);
 
-    public partial class FrmMain
+    public partial class UIGameGrid : UserControl
     {
+        public UpdateGameInfo updateGameInfo;
+        public PassBackRvFile updateDatInfo;
+        public PassBackRvFile LaunchEmulator;
+        public OpenMEnu MenuClick;
+
         private enum GameGridColumns
         {
             CType = 0,
@@ -24,84 +34,54 @@ namespace ROMVault
             CDateTime = 3,
             CRomStatus = 4
         }
+        public RvFile gameGridSource;
 
-        private RvFile gameGridSource;
+        private bool _updatingGameGrid;
+
+        private int gameSortIndex = -1;
+
+        private SortOrder gameSortDir = SortOrder.None;
+
+
+        private bool showDescription;
+        private static int[] _gameGridColumnXPositions;
+
 
         private RvFile[] gameGrid;
 
-        private int gameSortIndex = -1;
-        private SortOrder gameSortDir = SortOrder.None;
 
-        private bool showDescription;
 
-        private ContextMenuStrip _mnuGameGrid;
-
-        ToolStripMenuItem mnuGameScan1;
-        ToolStripMenuItem mnuGameScan2;
-        ToolStripMenuItem mnuGameScan3;
-        ToolStripMenuItem mnuOpenDir;
-        ToolStripMenuItem mnuOpenParentDir;
-        ToolStripMenuItem mnuDir2Dat;
-        ToolStripMenuItem mnuLaunchEmulator;
-
-        private void InitGameGridMenu()
+        public UIGameGrid()
         {
-            _mnuGameGrid = new ContextMenuStrip();
+            InitializeComponent();
+
+            Type dgvType = GameGrid.GetType();
+            PropertyInfo pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
+            pi.SetValue(GameGrid, true, null);
 
 
-            mnuGameScan1 = new ToolStripMenuItem
-            {
-                Text = @"Scan Quick (Headers Only)",
-                Tag = EScanLevel.Level1
-            };
-            mnuGameScan2 = new ToolStripMenuItem
-            {
-                Text = @"Scan",
-                Tag = EScanLevel.Level2
-            };
-            mnuGameScan3 = new ToolStripMenuItem
-            {
-                Text = @"Scan Full (Complete Re-Scan)",
-                Tag = EScanLevel.Level3
-            };
-
-            mnuGameScan1.Click += MnuGameScan;
-            mnuGameScan2.Click += MnuGameScan;
-            mnuGameScan3.Click += MnuGameScan;
-
-
-            mnuOpenDir = new ToolStripMenuItem
-            {
-                Text = @"Open Dir",
-                Tag = null
-            };
-            mnuOpenDir.Click += MnuOpenDir;
-
-            mnuOpenParentDir = new ToolStripMenuItem
-            {
-                Text = @"Open Parent",
-                Tag = null
-            };
-            mnuOpenParentDir.Click += MnuOpenParentDir;
-
-
-            mnuDir2Dat = new ToolStripMenuItem
-            {
-                Text = @"Dir2Dat",
-                Tag = null
-            };
-            mnuDir2Dat.Click += MnuDir2Dat;
-
-            mnuLaunchEmulator = new ToolStripMenuItem
-            {
-                Text = @"Launch emulator",
-                Tag = null
-            };
-            mnuLaunchEmulator.Click += LaunchEmulator;
+            _gameGridColumnXPositions = new int[(int)RepStatus.EndValue];
         }
 
 
-        private void ClearGameGrid()
+        public void SetDefaults(defaults defaults)
+        {
+            if (defaults.gg0_width != int.MinValue) GameGrid.Columns[0].Width = defaults.gg0_width;
+            if (defaults.gg1_width != int.MinValue) GameGrid.Columns[1].Width = defaults.gg1_width;
+            if (defaults.gg2_width != int.MinValue) GameGrid.Columns[2].Width = defaults.gg2_width;
+            if (defaults.gg3_width != int.MinValue) GameGrid.Columns[3].Width = defaults.gg3_width;
+        }
+
+        public void PutDefaults(defaults defaults)
+        {
+            defaults.gg0_width = GameGrid.Columns[0].Width;
+            defaults.gg1_width = GameGrid.Columns[1].Width;
+            defaults.gg2_width = GameGrid.Columns[2].Width;
+            defaults.gg3_width = GameGrid.Columns[3].Width;
+        }
+
+
+        public void ClearGameGrid()
         {
 
             if (Settings.IsMono)
@@ -110,15 +90,11 @@ namespace ROMVault
                 {
                     GameGrid.CurrentCell = GameGrid[0, 0];
                 }
-
-                if (RomGrid.RowCount > 0)
-                {
-                    RomGrid.CurrentCell = RomGrid[0, 0];
-                }
             }
 
             GameGrid.Rows.Clear();
-            RomGrid.Rows.Clear();
+
+            //grdRom.ClearRomGrid();
 
             // clear sorting
             if (gameSortIndex >= 0)
@@ -127,18 +103,18 @@ namespace ROMVault
             gameSortDir = SortOrder.None;
 
         }
-
-        private void UpdateGameGrid(RvFile tDir)
+        public void UpdateGameGrid(RvFile tDir)
         {
             gameGridSource = tDir;
             _updatingGameGrid = true;
 
             ClearGameGrid();
             UpdateGameGrid();
-
         }
 
-        private void UpdateGameGrid(bool onTimer = false)
+        public string FilterText = "";
+
+        public void UpdateGameGrid(bool onTimer = false)
         {
             if (gameGridSource == null)
                 return;
@@ -154,7 +130,7 @@ namespace ROMVault
 
                 bool wideTypeColumn = false;
 
-                string searchLowerCase = txtFilter.Text.ToLower();
+                string searchLowerCase = FilterText.ToLower();
                 for (int j = 0; j < gameGridSource.ChildCount; j++)
                 {
                     RvFile tChildDir = gameGridSource.Child(j);
@@ -163,7 +139,7 @@ namespace ROMVault
                         continue;
                     }
 
-                    if (txtFilter.Text.Length > 0 && !tChildDir.Name.ToLower().Contains(searchLowerCase))
+                    if (FilterText.Length > 0 && !tChildDir.Name.ToLower().Contains(searchLowerCase))
                     {
                         continue;
                     }
@@ -185,12 +161,12 @@ namespace ROMVault
                     bool gMIA = tDirStat.HasMIA();
                     bool gAllMerged = tDirStat.HasAllMerged();
 
-                    bool show = chkBoxShowComplete.Checked && gCorrect && !gMissing && !gFixes;
-                    show = show || chkBoxShowPartial.Checked && gMissing && gCorrect;
-                    show = show || chkBoxShowEmpty.Checked && gMissing && !gCorrect;
-                    show = show || chkBoxShowFixes.Checked && gFixes;
-                    show = show || chkBoxShowMIA.Checked && gMIA;
-                    show = show || chkBoxShowMerged.Checked && gAllMerged;
+                    bool show = Settings.rvSettings.chkBoxShowComplete && gCorrect && !gMissing && !gFixes;
+                    show = show || Settings.rvSettings.chkBoxShowPartial && gMissing && gCorrect;
+                    show = show || Settings.rvSettings.chkBoxShowEmpty && gMissing && !gCorrect;
+                    show = show || Settings.rvSettings.chkBoxShowFixes && gFixes;
+                    show = show || Settings.rvSettings.chkBoxShowMIA && gMIA;
+                    show = show || Settings.rvSettings.chkBoxShowMerged && gAllMerged;
                     show = show || gUnknown;
                     show = show || gInToSort;
                     show = show || tChildDir.GotStatus == GotStatus.Corrupt;
@@ -283,46 +259,6 @@ namespace ROMVault
             catch { }
         }
 
-        private static int DigitLength(int number)
-        {
-            int textNumber = number;
-            int len = 0;
-
-            while (textNumber > 0)
-            {
-                textNumber /= 10;
-                len++;
-            }
-
-            return len;
-        }
-
-        private void GameGridSelectionChanged(object sender, EventArgs e)
-        {
-            UpdateSelectedGame();
-        }
-
-        private void UpdateSelectedGame(bool onTimer = false)
-        {
-            if (_updatingGameGrid)
-            {
-                return;
-            }
-
-            if (GameGrid.SelectedRows.Count != 1)
-            {
-                UpdateGameMetaData(new RvFile(FileType.Dir));
-                UpdateRomGrid(gameGridSource, onTimer);
-                return;
-            }
-
-            RvFile tGame = gameGrid[GameGrid.SelectedRows[0].Index];
-
-            UpdateGameMetaData(tGame);
-            UpdateRomGrid(tGame, onTimer);
-        }
-
-
         private static string GetBitmapFromType(FileType ft, ZipStructure zs)
         {
             switch (ft)
@@ -347,6 +283,46 @@ namespace ROMVault
                     return "Dir";
             }
             return null;
+        }
+
+
+        private static int DigitLength(int number)
+        {
+            int textNumber = number;
+            int len = 0;
+
+            while (textNumber > 0)
+            {
+                textNumber /= 10;
+                len++;
+            }
+
+            return len;
+        }
+
+        private void UpdateSelectedGame(bool onTimer = false)
+        {
+            if (_updatingGameGrid)
+            {
+                return;
+            }
+
+            if (GameGrid.SelectedRows.Count != 1)
+            {
+                updateGameInfo?.Invoke(null, onTimer);
+                //ucGameInfo.UpdateGameMetaData(null);
+                //UpdateSidePannel(null);
+                //grdRom.UpdateRomGrid(null, onTimer);
+                return;
+            }
+
+            RvFile tGame = gameGrid[GameGrid.SelectedRows[0].Index];
+
+            updateGameInfo?.Invoke(tGame, onTimer);
+            //ucGameInfo.UpdateGameMetaData(tGame);
+            //UpdateSidePannel(tGame);
+            //grdRom.UpdateRomGrid(tGame, onTimer);
+            this.ActiveControl = GameGrid;
         }
 
         private void GameGridCellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
@@ -471,7 +447,7 @@ namespace ROMVault
                         break;
 
                     case GameGridColumns.CDateTime:
-                        e.Value = SetCell(CompressUtils.zipDateTimeToString(tRvDir.FileModTimeStamp), tRvDir, FileStatus.DateFromDAT, 0, 0);
+                    ///////////////      e.Value = SetCell(CompressUtils.zipDateTimeToString(tRvDir.FileModTimeStamp), tRvDir, FileStatus.DateFromDAT, 0, 0);
                         break;
 
                     case GameGridColumns.CRomStatus:
@@ -564,8 +540,8 @@ namespace ROMVault
 
                 if (tRvDir.GotStatus == GotStatus.FileLocked)
                 {
-                    e.CellStyle.BackColor = Dark.dark.Down(_displayColor[(int)RepStatus.UnScanned]);
-                    e.CellStyle.ForeColor = _fontColor[(int)RepStatus.UnScanned];
+                    e.CellStyle.BackColor = Dark.dark.Down(UIDisplayColors.DisplayColor(RepStatus.UnScanned));
+                    e.CellStyle.ForeColor = UIDisplayColors.FontColor(RepStatus.UnScanned);
                     return;
                 }
 
@@ -576,13 +552,13 @@ namespace ROMVault
                         continue;
                     }
 
-                    e.CellStyle.BackColor = Dark.dark.Down(_displayColor[(int)t1]);
-                    e.CellStyle.ForeColor = _fontColor[(int)t1];
+                    e.CellStyle.BackColor = Dark.dark.Down(UIDisplayColors.DisplayColor(t1));
+                    e.CellStyle.ForeColor = UIDisplayColors.FontColor(t1);
 
 
                     if (e.ColumnIndex <= (int)GameGridColumns.CType)
                     {
-                        e.CellStyle.SelectionBackColor = _displayColor[(int)t1];
+                        e.CellStyle.SelectionBackColor = UIDisplayColors.DisplayColor(t1);
                     }
                     return;
                 }
@@ -692,6 +668,58 @@ namespace ROMVault
 
         }
 
+        private void GameGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+
+        }
+
+
+        private void GameGridSelectionChanged(object sender, EventArgs e)
+        {
+            UpdateSelectedGame();
+        }
+
+        private void GameGridMouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (_updatingGameGrid)
+                return;
+
+
+            if (e.Button == MouseButtons.Right)
+            {
+                RvFile tParent = gameGridSource?.Parent;
+                if (tParent == null)
+                    return;
+                UpdateGameGrid(tParent);
+                updateDatInfo?.Invoke(tParent);
+                //ctrRvTree.SetSelected(tParent);
+                //ucDatInfo.UpdateDatMetaData(tParent);
+                return;
+            }
+
+            if (e.Button != MouseButtons.Left)
+                return;
+
+
+            if (GameGrid.SelectedRows.Count != 1)
+                return;
+
+            RvFile tGame = gameGrid[GameGrid.SelectedRows[0].Index];
+            if (tGame.Game == null && tGame.FileType == FileType.Dir)
+            {
+                UpdateGameGrid(tGame);
+                updateDatInfo?.Invoke(tGame);
+                //ctrRvTree.SetSelected(tGame);
+                //ucDatInfo.UpdateDatMetaData(tGame);
+            }
+            else
+            {
+                LaunchEmulator?.Invoke(tGame);
+            }
+        }
+
+
+
         private void GameGridMouseUp(object sender, MouseEventArgs e)
         {
             try
@@ -706,75 +734,9 @@ namespace ROMVault
                 if (mouseRow < 0)
                     return;
 
-
-                Point controLocation = ControlLoc(GameGrid);
-
                 if (Control.ModifierKeys == Keys.Shift)
                 {
-                    _mnuGameGrid.Items.Clear();
-
-                    RvFile thisGame = gameGrid[mouseRow];
-
-                    var item = new ToolStripSeparator();
-                    if (thisGame.FileType == FileType.Dir && !_working)
-                    {
-                        _mnuGameGrid.Items.Add(mnuGameScan2);
-                        _mnuGameGrid.Items.Add(mnuGameScan1);
-                        _mnuGameGrid.Items.Add(mnuGameScan3);
-                        _mnuGameGrid.Items.Insert(3, item);
-                    }
-
-                    bool found = false;
-                    if (thisGame.FileType == FileType.Dir)
-                    {
-                        if ((Settings.rvSettings.Permissions & 4) == 4)
-                            _mnuGameGrid.Items.Add(mnuDir2Dat);
-
-                        string folderPath = thisGame.FullNameCase;
-                        if (Directory.Exists(folderPath))
-                        {
-                            found = true;
-                            mnuOpenDir.Text = "Open Dir";
-                            _mnuGameGrid.Items.Add(mnuOpenDir);
-                        }
-                    }
-
-                    if (thisGame.FileType == FileType.Zip || thisGame.FileType == FileType.SevenZip)
-                    {
-                        string zipPath = thisGame.FullNameCase;
-                        if (File.Exists(zipPath))
-                        {
-                            found = true;
-                            if (thisGame.FileType == FileType.Zip)
-                                mnuOpenDir.Text = "Open Zip";
-
-                            if (thisGame.FileType == FileType.SevenZip)
-                                mnuOpenDir.Text = "Open 7Zip";
-                            _mnuGameGrid.Items.Add(mnuOpenDir);
-                        }
-                    }
-
-                    {
-                        string parentPath = thisGame.Parent.FullName;
-                        if (Directory.Exists(parentPath))
-                        {
-                            found = true;
-                            mnuOpenParentDir.Text = "Open Parent";
-                            _mnuGameGrid.Items.Add(mnuOpenParentDir);
-                        }
-                    }
-
-                    if (FindEmulatorInfo(thisGame) != null && found)
-                        _mnuGameGrid.Items.Add(mnuLaunchEmulator);
-
-                    if (_mnuGameGrid.Items.Count == 0)
-                        return;
-
-                    if (_mnuGameGrid.Items[_mnuGameGrid.Items.Count - 1] == item)
-                        _mnuGameGrid.Items.RemoveAt(_mnuGameGrid.Items.Count - 1);
-
-                    _mnuGameGrid.Tag = thisGame;
-                    _mnuGameGrid.Show(this, new Point(controLocation.X + e.X - 32, controLocation.Y + e.Y - 10));
+                    MenuClick?.Invoke(gameGrid[mouseRow], e);
                     return;
                 }
 
@@ -812,164 +774,6 @@ namespace ROMVault
             return;
         }
 
-        private void MnuGameScan(object sender, EventArgs e)
-        {
-            if (_working)
-                return;
-            RvFile thisFile = (RvFile)_mnuGameGrid.Tag;
-            ScanRoms((EScanLevel)((ToolStripMenuItem)sender).Tag, thisFile);
-        }
 
-        private void MnuOpenDir(object sender, EventArgs e)
-        {
-            RvFile thisFile = (RvFile)_mnuGameGrid.Tag;
-            if (thisFile.FileType == FileType.Dir)
-            {
-                RVProcess.StartDIR(thisFile.FullNameCase);
-                return;
-            }
-            if (thisFile.FileType == FileType.Zip || thisFile.FileType == FileType.SevenZip)
-            {
-                string zipPath = thisFile.FullNameCase;
-                if (File.Exists(zipPath))
-                {
-                    RVProcess.StartURL(zipPath);
-                }
-                return;
-            }
-        }
-
-        private void MnuOpenParentDir(object sender, EventArgs e)
-        {
-            RvFile thisFile = (RvFile)_mnuGameGrid.Tag;
-            thisFile = thisFile.Parent;
-            if (thisFile == null)
-                return;
-            if (thisFile.FileType == FileType.Dir)
-            {
-                RVProcess.StartDIR(thisFile.FullNameCase);
-                return;
-            }
-        }
-
-
-        frmDir2Dat d2d = null;
-
-        private void MnuDir2Dat(object sender, EventArgs e)
-        {
-            if (d2d == null)
-                d2d = new frmDir2Dat();
-
-            d2d.PopulateFrom((RvFile)_mnuGameGrid.Tag);
-            d2d.ShowDialog();
-        }
-
-
-
-
-        private void LaunchEmulator(object sender, EventArgs e)
-        {
-            RvFile tGame = _mnuGameGrid.Tag as RvFile;
-            if (tGame != null)
-                LaunchEmulator(tGame);
-        }
-        private EmulatorInfo FindEmulatorInfo(RvFile tGame)
-        {
-            string path = tGame.Parent.DatTreeFullName;
-            if (Settings.rvSettings?.EInfo == null)
-                return null;
-            if (path == "Error")
-                return null;
-            if (path.Length <= 8)
-                return null;
-
-            foreach (EmulatorInfo ei in Settings.rvSettings.EInfo)
-            {
-                if (!string.Equals(path.Substring(8), ei.TreeDir, StringComparison.CurrentCultureIgnoreCase))
-                    continue;
-
-                if (string.IsNullOrWhiteSpace(ei.CommandLine))
-                    continue;
-
-                if (!File.Exists(ei.ExeName))
-                    continue;
-                return ei;
-            }
-            return null;
-        }
-
-        private void LaunchEmulator(RvFile tGame)
-        {
-            EmulatorInfo ei = FindEmulatorInfo(tGame);
-            if (ei == null)
-                return;
-
-            string commandLineOptions = ei.CommandLine;
-            string dirname = tGame.Parent.FullName;
-            if (dirname.StartsWith("RomRoot\\"))
-                dirname = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), dirname);
-
-            commandLineOptions = commandLineOptions.Replace("{gamename}", Path.GetFileNameWithoutExtension(tGame.Name));
-            commandLineOptions = commandLineOptions.Replace("{gamefilename}", tGame.Name);
-            commandLineOptions = commandLineOptions.Replace("{gamedirectory}", dirname);
-
-            string workingDir = ei.WorkingDirectory;
-            if (string.IsNullOrWhiteSpace(workingDir))
-                workingDir = Path.GetDirectoryName(ei.ExeName);
-
-            using (Process exeProcess = new Process())
-            {
-                exeProcess.StartInfo.WorkingDirectory = workingDir;
-                exeProcess.StartInfo.FileName = ei.ExeName;
-                exeProcess.StartInfo.Arguments = commandLineOptions;
-                exeProcess.StartInfo.UseShellExecute = false;
-                exeProcess.StartInfo.CreateNoWindow = true;
-                exeProcess.Start();
-            }
-        }
-
-        private void GameGridMouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            if (_updatingGameGrid)
-                return;
-
-
-            if (e.Button == MouseButtons.Right)
-            {
-                RvFile tParent = gameGridSource?.Parent;
-                if (tParent == null)
-                    return;
-                UpdateGameGrid(tParent);
-                ctrRvTree.SetSelected(tParent);
-
-                UpdateDatMetaData(tParent);
-                return;
-            }
-
-            if (e.Button != MouseButtons.Left)
-                return;
-
-
-            if (GameGrid.SelectedRows.Count != 1)
-                return;
-
-            RvFile tGame = gameGrid[GameGrid.SelectedRows[0].Index];
-            if (tGame.Game == null && tGame.FileType == FileType.Dir)
-            {
-                UpdateGameGrid(tGame);
-                ctrRvTree.SetSelected(tGame);
-
-                UpdateDatMetaData(tGame);
-            }
-            else
-            {
-                LaunchEmulator(tGame);
-            }
-        }
-
-        private void GameGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
-        {
-
-        }
     }
 }

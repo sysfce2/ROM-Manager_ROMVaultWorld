@@ -9,8 +9,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace ROMVault
+namespace ROMVault.UIElements
 {
+
     public enum eRomGrid
     {
         Got = 0,
@@ -31,8 +32,9 @@ namespace ROMVault
 
     }
 
-    public partial class FrmMain
+    public partial class UIRomGrid : UserControl
     {
+     
         private RvFile[] romGrid;
         private int romSortIndex = -1;
         private SortOrder romSortDir = SortOrder.None;
@@ -41,8 +43,62 @@ namespace ROMVault
         private bool showMerge;
         private bool showStatus;
         private bool showFileModDate;
+        public UIRomGrid()
+        {
+            InitializeComponent();
+        }
 
-        private void UpdateRomGrid(RvFile tGame, bool onTimer = false)
+
+        public void SetDefaults(defaults defaults)
+        {
+            if (defaults.rg0_width != int.MinValue) RomGrid.Columns[0].Width = defaults.rg0_width;
+            if (defaults.rg1_width != int.MinValue) RomGrid.Columns[1].Width = defaults.rg1_width;
+            if (defaults.rg2_width != int.MinValue) RomGrid.Columns[2].Width = defaults.rg2_width;
+            if (defaults.rg3_width != int.MinValue) RomGrid.Columns[3].Width = defaults.rg3_width;
+            if (defaults.rg4_width != int.MinValue) RomGrid.Columns[4].Width = defaults.rg4_width;
+            if (defaults.rg5_width != int.MinValue) RomGrid.Columns[5].Width = defaults.rg5_width;
+            if (defaults.rg6_width != int.MinValue) RomGrid.Columns[6].Width = defaults.rg6_width;
+            if (defaults.rg7_width != int.MinValue) RomGrid.Columns[7].Width = defaults.rg7_width;
+            if (defaults.rg8_width != int.MinValue) RomGrid.Columns[8].Width = defaults.rg8_width;
+            if (defaults.rg9_width != int.MinValue) RomGrid.Columns[9].Width = defaults.rg9_width;
+            if (defaults.rg10_width != int.MinValue) RomGrid.Columns[10].Width = defaults.rg10_width;
+            if (defaults.rg11_width != int.MinValue) RomGrid.Columns[11].Width = defaults.rg11_width;
+            if (defaults.rg12_width != int.MinValue) RomGrid.Columns[12].Width = defaults.rg12_width;
+            if (defaults.rg13_width != int.MinValue) RomGrid.Columns[13].Width = defaults.rg13_width;
+            if (defaults.rg14_width != int.MinValue) RomGrid.Columns[14].Width = defaults.rg14_width;
+        }
+
+        public void PutDefaults(defaults defaults)
+        {
+            defaults.rg0_width = RomGrid.Columns[0].Width;
+            defaults.rg1_width = RomGrid.Columns[1].Width;
+            defaults.rg2_width = RomGrid.Columns[2].Width;
+            defaults.rg3_width = RomGrid.Columns[3].Width;
+            defaults.rg4_width = RomGrid.Columns[4].Width;
+            defaults.rg5_width = RomGrid.Columns[5].Width;
+            defaults.rg6_width = RomGrid.Columns[6].Width;
+            defaults.rg7_width = RomGrid.Columns[7].Width;
+            defaults.rg8_width = RomGrid.Columns[8].Width;
+            defaults.rg9_width = RomGrid.Columns[9].Width;
+            defaults.rg10_width = RomGrid.Columns[10].Width;
+            defaults.rg11_width = RomGrid.Columns[11].Width;
+            defaults.rg12_width = RomGrid.Columns[12].Width;
+            defaults.rg13_width = RomGrid.Columns[13].Width;
+            defaults.rg14_width = RomGrid.Columns[14].Width;
+        }
+
+        public void ClearRomGrid()
+        {
+            if (Settings.IsMono && RomGrid.RowCount > 0)
+            {
+                RomGrid.CurrentCell = RomGrid[0, 0];
+            }
+
+            RomGrid.Rows.Clear();
+            romGrid = null;
+        }
+
+        public void UpdateRomGrid(RvFile tGame, bool onTimer = false)
         {
             if (!onTimer)
             {
@@ -70,7 +126,7 @@ namespace ROMVault
             romGrid = fileList.ToArray();
             if (RomGrid.RowCount != romGrid.Length)
                 RomGrid.RowCount = romGrid.Length;
-          
+
             RomGrid.Columns[(int)eRomGrid.Merge].Visible = showMerge;
 
             RomGrid.Columns[(int)eRomGrid.AltSize].Visible = showAlt;
@@ -140,7 +196,7 @@ namespace ROMVault
             try
             {
 
-                if (tFile.DatStatus != DatStatus.InDatMerged || tFile.RepStatus != RepStatus.NotCollected || chkBoxShowMerged.Checked)
+                if (tFile.DatStatus != DatStatus.InDatMerged || tFile.RepStatus != RepStatus.NotCollected)////////// || chkBoxShowMerged.Checked)
                 {
                     tFile.UiDisplayName = pathAdd + tFile.Name;
                     fileList.Add(tFile);
@@ -314,8 +370,8 @@ namespace ROMVault
             try
             {
                 RvFile tFile = romGrid[e.RowIndex];
-                e.CellStyle.BackColor = Dark.dark.Down(_displayColor[(int)ReportStatus.UIStatus(tFile.MIAStatus, tFile.RepStatus)]);
-                e.CellStyle.ForeColor = _fontColor[(int)tFile.RepStatus];
+                e.CellStyle.BackColor = Dark.dark.Down(UIDisplayColors.DisplayColor(ReportStatus.UIStatus(tFile.MIAStatus, tFile.RepStatus)));
+                e.CellStyle.ForeColor = UIDisplayColors.FontColor(tFile.RepStatus);
             }
             catch { }
         }

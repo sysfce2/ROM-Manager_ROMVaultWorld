@@ -414,17 +414,7 @@ namespace RomVaultCore
 
     }
 
-    public static class StringConv
-    {
-        public static string ToRvString(this int val)
-        {
-            return val.ToString("N0");
-        }
-        public static string ToRvString(this ulong val)
-        {
-            return val.ToString("N0");
-        }
-    }
+
     public class DirMapping : IComparable<DirMapping>
     {
         public string DirKey;

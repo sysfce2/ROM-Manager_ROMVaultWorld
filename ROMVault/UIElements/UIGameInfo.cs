@@ -1,14 +1,16 @@
-﻿using System;
+﻿using RomVaultCore;
+using RomVaultCore.RvDB;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using RomVaultCore;
-using RomVaultCore.RvDB;
 using RVIO;
 
-namespace ROMVault
+namespace ROMVault.UIElements
 {
-    public partial class FrmMain
+    public partial class UIGameInfo : UserControl
     {
+        private float _scaleFactorX = 1;
+        private float _scaleFactorY = 1;
         private Label _labelGameName;
         private TextBox _textGameName;
         private Label _buttonGameName;
@@ -81,6 +83,12 @@ namespace ROMVault
 
 
 
+        public UIGameInfo()
+        {
+            InitializeComponent();
+        }
+
+
         private void AddTextBox(int line, string name, int x, int x1, out Label lBox, out TextBox tBox)
         {
             int y = 14 + line * 16;
@@ -144,7 +152,8 @@ namespace ROMVault
             return button;
         }
 
-        private void AddGameMetaData()
+
+        public void AddGameMetaData()
         {
             _buttonGameName = AddLinkLabel();
             AddTextBox(0, "Name", 6, 84, out _labelGameName, out _textGameName);
@@ -191,6 +200,7 @@ namespace ROMVault
 
         }
 
+
         private void buttonLink_Click(object sender, EventArgs e)
         {
 
@@ -201,8 +211,8 @@ namespace ROMVault
 
         private void SetLinkButton(RvFile tGame)
         {
-            string gameId = tGame.Game?.GetData(RvGame.GameData.Id);
-            string homepage = tGame.Dat?.GetData(RvDat.DatData.HomePage);
+            string gameId = tGame?.Game?.GetData(RvGame.GameData.Id);
+            string homepage = tGame?.Dat?.GetData(RvDat.DatData.HomePage);
             if (!string.IsNullOrWhiteSpace(gameId))
             {
                 string datId = tGame.Dat?.GetData(RvDat.DatData.Id);
@@ -236,9 +246,10 @@ namespace ROMVault
             _buttonGameName.Visible = false;
         }
 
+
         private void SetCloneLinkButton(RvFile tGame)
         {
-            string cloneOfId = tGame.Game?.GetData(RvGame.GameData.CloneOfId);
+            string cloneOfId = tGame?.Game?.GetData(RvGame.GameData.CloneOfId);
             if (!string.IsNullOrWhiteSpace(cloneOfId))
             {
                 string homepage = tGame.Dat?.GetData(RvDat.DatData.HomePage);
@@ -254,29 +265,30 @@ namespace ROMVault
             _buttonGameCloneOf.Visible = false;
         }
 
-        private void UpdateGameMetaData(RvFile tGame)
+        public void UpdateGameMetaData(RvFile tGame)
         {
-            _textGameName.Text = tGame.Name;
+
+            _textGameName.Text = tGame?.Name??"";
             SetLinkButton(tGame);
             SetCloneLinkButton(tGame);
 
-            if (tGame.Game == null)
+            if (tGame?.Game == null)
             {
                 SetDescriptionVisible(false);
             }
 
-            if (tGame.Game == null || tGame.Game.GetData(RvGame.GameData.EmuArc) != "yes")
+            if (tGame?.Game == null || tGame.Game.GetData(RvGame.GameData.EmuArc) != "yes")
             {
                 SetTruripVisible(false);
             }
 
-            if (tGame.Game == null || tGame.Game.GetData(RvGame.GameData.EmuArc) == "yes")
+            if (tGame?.Game == null || tGame.Game.GetData(RvGame.GameData.EmuArc) == "yes")
             {
                 SetMainVisible(false);
             }
 
 
-            if (tGame.Game != null)
+            if (tGame?.Game != null)
             {
                 if (tGame.Game.GetData(RvGame.GameData.EmuArc) == "yes")
                 {
@@ -298,8 +310,6 @@ namespace ROMVault
                     _textTruripRatings.Text = tGame.Game.GetData(RvGame.GameData.Ratings);
                     _textTruripScore.Text = tGame.Game.GetData(RvGame.GameData.Score);
                     SetTruripVisible(true);
-
-                    LoadTruRipPannel(tGame);
                 }
                 else
                 {
@@ -318,51 +328,8 @@ namespace ROMVault
                     _textGameVersion.Text = tGame.Game.GetData(RvGame.GameData.Version);
 
                     SetMainVisible(true);
-
-
-
-                    bool found = false;
-                    string path = tGame.Parent.DatTreeFullName;
-                    foreach (EmulatorInfo ei in Settings.rvSettings.EInfo)
-                    {
-                        if (path.Length <= 8)
-                            continue;
-
-                        if (!string.Equals(path.Substring(8), ei.TreeDir, StringComparison.CurrentCultureIgnoreCase))
-                            continue;
-
-                        if (string.IsNullOrWhiteSpace(ei.ExtraPath))
-                            continue;
-
-                        if (ei.ExtraPath != null)
-                        {
-                            found = true;
-                            if (ei.ExtraPath.Substring(0, 1) == "%")
-                                LoadMameSLPannels(tGame, ei.ExtraPath.Substring(1));
-                            else
-                                LoadMamePannels(tGame, ei.ExtraPath);
-
-                            break;
-                        }
-                    }
-
-                    if (!found)
-                        found = LoadNFOPannel(tGame);
-
-                    if (!found)
-                        found = LoadC64Pannel(tGame);
-
-                    if (!found)
-                        HidePannel();
-
                 }
             }
-            else
-            {
-                HidePannel();
-            }
-
-            this.ActiveControl = GameGrid;
         }
 
 
@@ -533,5 +500,13 @@ namespace ROMVault
             _textTruripScore.Left = text3Left;
             _textTruripScore.Width = textWidth;
         }
+
+
+        public void SetScaleFactor(SizeF factor)
+        {
+            _scaleFactorX *= factor.Width;
+            _scaleFactorY *= factor.Height;
+        }
+
     }
 }
