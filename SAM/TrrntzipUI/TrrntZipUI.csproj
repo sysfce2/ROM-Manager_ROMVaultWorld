@@ -8,7 +8,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>disable</ImplicitUsings>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo> 
-	<ApplicationIcon>chip.ico</ApplicationIcon>    
+	<ApplicationIcon>chip.ico</ApplicationIcon> 
+	<Platforms>AnyCPU;X64</Platforms>    
   </PropertyGroup>
 
   <ItemGroup>

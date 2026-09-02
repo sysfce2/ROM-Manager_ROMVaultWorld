@@ -13,6 +13,7 @@
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <BaseOutputPath>D:\stage\RomVault\</BaseOutputPath>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
+    <Platforms>X64</Platforms>
   </PropertyGroup>
 	
   <ItemGroup>

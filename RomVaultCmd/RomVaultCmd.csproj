@@ -9,16 +9,8 @@
     <Version>3.7.6</Version>
     <BaseOutputPath></BaseOutputPath>
     <Configurations>Debug;Release</Configurations>
+    <Platforms>X64</Platforms>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\..\stage\Private\Release\RVCmd\</OutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\..\stage\Private\Debug\RVCmd\</OutputPath>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\RomVaultCore\RomVaultCore.csproj" />
   </ItemGroup>
