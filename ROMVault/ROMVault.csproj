@@ -8,14 +8,14 @@
     <AssemblyName>ROMVault38</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <NoWarn>$(NoWarn);WFO1000;CA1416</NoWarn>
-    <Configurations>Debug;Release;</Configurations>
+    <Configurations>Debug;Release;DebugProd;ReleaseProd</Configurations>
     <ApplicationIcon>chip.ico</ApplicationIcon>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <BaseOutputPath>D:\stage\RomVault\</BaseOutputPath>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
     <Platforms>X64</Platforms>
   </PropertyGroup>
-	
+
   <ItemGroup>
     <Content Include="chip.ico" />
   </ItemGroup>
@@ -26,11 +26,11 @@
 	<ProjectReference Include="..\SAM\TrrntZipUICore\TrrntZipUICore.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(DefineConstants.Contains(`external`))' == 'true'">
+  <ItemGroup Condition="'$(Configuration)'=='DebugProd' or '$(Configuration)'=='ReleaseProd'">
 	<ProjectReference Include="..\..\RVWorldPrivate\ExtensionsDV\ExtensionsDV.csproj" />
-  </ItemGroup>
+  </ItemGroup> 
 
-  <ItemGroup Condition="'$(DefineConstants.Contains(`external`))' != 'true'">
+  <ItemGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
 	<ProjectReference Include="..\Extensions\Extensions.csproj" />
   </ItemGroup>
 
