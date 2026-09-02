@@ -31,16 +31,7 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             splitToolBarMain = new System.Windows.Forms.SplitContainer();
-            lblTreePreSets = new System.Windows.Forms.Label();
-            btnDefault4 = new System.Windows.Forms.Button();
-            btnDefault3 = new System.Windows.Forms.Button();
-            btnDefault2 = new System.Windows.Forms.Button();
-            btnDefault1 = new System.Windows.Forms.Button();
-            btnReport = new System.Windows.Forms.Button();
-            btnFixFiles = new System.Windows.Forms.Button();
-            btnFindFixes = new System.Windows.Forms.Button();
-            btnScanRoms = new System.Windows.Forms.Button();
-            btnUpdateDats = new System.Windows.Forms.Button();
+            sideButtons = new ROMVault.UIElements.UISideButtons();
             splitDatInfoGameInfo = new System.Windows.Forms.SplitContainer();
             splitDatInfoTree = new System.Windows.Forms.SplitContainer();
             ucDatInfo = new UIDatInfo();
@@ -57,8 +48,8 @@
             chkBoxShowComplete = new System.Windows.Forms.CheckBox();
             splitListArt = new System.Windows.Forms.SplitContainer();
             splitGameListRomList = new System.Windows.Forms.SplitContainer();
-            grdRom = new ROMVault.UIElements.UIRomGrid();
             grdGame = new ROMVault.UIElements.UIGameGrid();
+            grdRom = new ROMVault.UIElements.UIRomGrid();
             tabSideArtwork = new System.Windows.Forms.TabControl();
             tabArtWork = new System.Windows.Forms.TabPage();
             picLogo = new System.Windows.Forms.PictureBox();
@@ -126,6 +117,7 @@
             splitListArt.Panel2.SuspendLayout();
             splitListArt.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitGameListRomList).BeginInit();
+            splitGameListRomList.Panel1.SuspendLayout();
             splitGameListRomList.Panel2.SuspendLayout();
             splitGameListRomList.SuspendLayout();
             tabSideArtwork.SuspendLayout();
@@ -155,18 +147,7 @@
             // 
             // splitToolBarMain.Panel1
             // 
-            splitToolBarMain.Panel1.BackColor = System.Drawing.Color.White;
-            splitToolBarMain.Panel1.Controls.Add(lblTreePreSets);
-            splitToolBarMain.Panel1.Controls.Add(btnDefault4);
-            splitToolBarMain.Panel1.Controls.Add(btnDefault3);
-            splitToolBarMain.Panel1.Controls.Add(btnDefault2);
-            splitToolBarMain.Panel1.Controls.Add(btnDefault1);
-            splitToolBarMain.Panel1.Controls.Add(btnReport);
-            splitToolBarMain.Panel1.Controls.Add(btnFixFiles);
-            splitToolBarMain.Panel1.Controls.Add(btnFindFixes);
-            splitToolBarMain.Panel1.Controls.Add(btnScanRoms);
-            splitToolBarMain.Panel1.Controls.Add(btnUpdateDats);
-            splitToolBarMain.Panel1.Resize += splitToolBarMain_Panel1_Resize;
+            splitToolBarMain.Panel1.Controls.Add(sideButtons);
             // 
             // splitToolBarMain.Panel2
             // 
@@ -175,113 +156,24 @@
             splitToolBarMain.SplitterDistance = 80;
             splitToolBarMain.TabIndex = 5;
             // 
-            // lblTreePreSets
+            // sideButtons
             // 
-            lblTreePreSets.AutoSize = true;
-            lblTreePreSets.Location = new System.Drawing.Point(2, 631);
-            lblTreePreSets.Name = "lblTreePreSets";
-            lblTreePreSets.Size = new System.Drawing.Size(75, 15);
-            lblTreePreSets.TabIndex = 18;
-            lblTreePreSets.Text = "Tree Pre-Sets";
-            // 
-            // btnDefault4
-            // 
-            btnDefault4.BackgroundImage = rvImages1.default4;
-            btnDefault4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            btnDefault4.Location = new System.Drawing.Point(39, 682);
-            btnDefault4.Name = "btnDefault4";
-            btnDefault4.Size = new System.Drawing.Size(40, 40);
-            btnDefault4.TabIndex = 17;
-            btnDefault4.UseVisualStyleBackColor = true;
-            btnDefault4.MouseDown += btnDefault4_MouseDown;
-            // 
-            // btnDefault3
-            // 
-            btnDefault3.BackgroundImage = rvImages1.default3;
-            btnDefault3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            btnDefault3.Location = new System.Drawing.Point(0, 682);
-            btnDefault3.Name = "btnDefault3";
-            btnDefault3.Size = new System.Drawing.Size(40, 40);
-            btnDefault3.TabIndex = 16;
-            btnDefault3.UseVisualStyleBackColor = true;
-            btnDefault3.MouseDown += btnDefault3_MouseDown;
-            // 
-            // btnDefault2
-            // 
-            btnDefault2.BackgroundImage = rvImages1.default2;
-            btnDefault2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            btnDefault2.Location = new System.Drawing.Point(39, 643);
-            btnDefault2.Name = "btnDefault2";
-            btnDefault2.Size = new System.Drawing.Size(40, 40);
-            btnDefault2.TabIndex = 15;
-            btnDefault2.UseVisualStyleBackColor = true;
-            btnDefault2.MouseDown += btnDefault2_MouseDown;
-            // 
-            // btnDefault1
-            // 
-            btnDefault1.BackgroundImage = rvImages1.default1;
-            btnDefault1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            btnDefault1.Location = new System.Drawing.Point(0, 643);
-            btnDefault1.Name = "btnDefault1";
-            btnDefault1.Size = new System.Drawing.Size(40, 40);
-            btnDefault1.TabIndex = 14;
-            btnDefault1.UseVisualStyleBackColor = true;
-            btnDefault1.MouseDown += btnDefault1_MouseDown;
-            // 
-            // btnReport
-            // 
-            btnReport.BackgroundImage = rvImages1.btnReport_Enabled;
-            btnReport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            btnReport.Location = new System.Drawing.Point(0, 320);
-            btnReport.Name = "btnReport";
-            btnReport.Size = new System.Drawing.Size(80, 81);
-            btnReport.TabIndex = 13;
-            btnReport.UseVisualStyleBackColor = true;
-            btnReport.MouseUp += BtnReportMouseUp;
-            // 
-            // btnFixFiles
-            // 
-            btnFixFiles.BackgroundImage = rvImages1.btnFixFiles_Enabled;
-            btnFixFiles.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            btnFixFiles.Location = new System.Drawing.Point(0, 240);
-            btnFixFiles.Name = "btnFixFiles";
-            btnFixFiles.Size = new System.Drawing.Size(80, 81);
-            btnFixFiles.TabIndex = 10;
-            btnFixFiles.UseVisualStyleBackColor = true;
-            btnFixFiles.MouseUp += BtnFixFilesMouseUp;
-            // 
-            // btnFindFixes
-            // 
-            btnFindFixes.BackgroundImage = rvImages1.btnFindFixes_Enabled;
-            btnFindFixes.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            btnFindFixes.Location = new System.Drawing.Point(0, 160);
-            btnFindFixes.Name = "btnFindFixes";
-            btnFindFixes.Size = new System.Drawing.Size(80, 81);
-            btnFindFixes.TabIndex = 9;
-            btnFindFixes.UseVisualStyleBackColor = true;
-            btnFindFixes.MouseUp += btnFindFixes_MouseUp;
-            // 
-            // btnScanRoms
-            // 
-            btnScanRoms.BackgroundImage = rvImages1.btnScanRoms_Enabled;
-            btnScanRoms.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            btnScanRoms.Location = new System.Drawing.Point(0, 80);
-            btnScanRoms.Name = "btnScanRoms";
-            btnScanRoms.Size = new System.Drawing.Size(80, 81);
-            btnScanRoms.TabIndex = 8;
-            btnScanRoms.UseVisualStyleBackColor = true;
-            btnScanRoms.Click += BtnScanRomsClick;
-            // 
-            // btnUpdateDats
-            // 
-            btnUpdateDats.BackgroundImage = rvImages1.btnUpdateDats_Enabled;
-            btnUpdateDats.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            btnUpdateDats.Location = new System.Drawing.Point(0, 0);
-            btnUpdateDats.Name = "btnUpdateDats";
-            btnUpdateDats.Size = new System.Drawing.Size(80, 81);
-            btnUpdateDats.TabIndex = 0;
-            btnUpdateDats.UseVisualStyleBackColor = true;
-            btnUpdateDats.MouseUp += BtnUpdateDatsMouseUp;
+            sideButtons.Dock = System.Windows.Forms.DockStyle.Fill;
+            sideButtons.Location = new System.Drawing.Point(0, 0);
+            sideButtons.MaximumSize = new System.Drawing.Size(80, 0);
+            sideButtons.MinimumSize = new System.Drawing.Size(80, 0);
+            sideButtons.Name = "sideButtons";
+            sideButtons.Size = new System.Drawing.Size(80, 725);
+            sideButtons.TabIndex = 1;
+            sideButtons.BtnUpdateDats_MouseUp += sideButtons_BtnUpdateDats_MouseUp;
+            sideButtons.BtnScanRoms_MouseUp += sideButtons_BtnScanRoms_MouseUp;
+            sideButtons.BtnFindFixes_MouseUp += sideButtons_BtnFindFixes_MouseUp;
+            sideButtons.BtnFixFiles_MouseUp += sideButtons_BtnFixFiles_MouseUp;
+            sideButtons.BtnReport_MouseUp += sideButtons_BtnReport_MouseUp;
+            sideButtons.BtnDefault1_MouseUp += sideButtons_BtnDefault1_MouseUp;
+            sideButtons.BtnDefault2_MouseUp += sideButtons_BtnDefault2_MouseUp;
+            sideButtons.BtnDefault3_MouseUp += sideButtons_BtnDefault3_MouseUp;
+            sideButtons.BtnDefault4_MouseUp += sideButtons_BtnDefault4_MouseUp;
             // 
             // splitDatInfoGameInfo
             // 
@@ -496,20 +388,23 @@
             splitGameListRomList.Name = "splitGameListRomList";
             splitGameListRomList.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
-            // splitGameListRomList.Panel2
+            // splitGameListRomList.Panel1
             // 
             splitGameListRomList.Panel1.Controls.Add(grdGame);
+            // 
+            // splitGameListRomList.Panel2
+            // 
             splitGameListRomList.Panel2.Controls.Add(grdRom);
             splitGameListRomList.Size = new System.Drawing.Size(593, 573);
             splitGameListRomList.SplitterDistance = 244;
             splitGameListRomList.TabIndex = 0;
-            //
+            // 
             // grdGame
-            //
+            // 
             grdGame.Dock = System.Windows.Forms.DockStyle.Fill;
             grdGame.Location = new System.Drawing.Point(0, 0);
             grdGame.Name = "grdGame";
-            grdGame.Size = new System.Drawing.Size(593, 325);
+            grdGame.Size = new System.Drawing.Size(593, 244);
             grdGame.TabIndex = 0;
             // 
             // grdRom
@@ -959,7 +854,6 @@
             Text = "RomVault (V3.0)";
             FormClosed += FrmMain_FormClosed;
             splitToolBarMain.Panel1.ResumeLayout(false);
-            splitToolBarMain.Panel1.PerformLayout();
             splitToolBarMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitToolBarMain).EndInit();
             splitToolBarMain.ResumeLayout(false);
@@ -980,6 +874,7 @@
             splitListArt.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitListArt).EndInit();
             splitListArt.ResumeLayout(false);
+            splitGameListRomList.Panel1.ResumeLayout(false);
             splitGameListRomList.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitGameListRomList).EndInit();
             splitGameListRomList.ResumeLayout(false);
@@ -1009,11 +904,6 @@
         #endregion
 
         private System.Windows.Forms.SplitContainer splitToolBarMain;
-        private System.Windows.Forms.Button btnReport;
-        private System.Windows.Forms.Button btnFixFiles;
-        private System.Windows.Forms.Button btnFindFixes;
-        private System.Windows.Forms.Button btnScanRoms;
-        private System.Windows.Forms.Button btnUpdateDats;
         private System.Windows.Forms.SplitContainer splitDatInfoGameInfo;
         private System.Windows.Forms.SplitContainer splitDatInfoTree;
         private System.Windows.Forms.SplitContainer splitGameInfoLists;
@@ -1061,12 +951,6 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.ToolStripMenuItem updateNewDATsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem updateAllDATsToolStripMenuItem;
-
-        private System.Windows.Forms.Button btnDefault2;
-        private System.Windows.Forms.Button btnDefault1;
-        private System.Windows.Forms.Button btnDefault4;
-        private System.Windows.Forms.Button btnDefault3;
-        private System.Windows.Forms.Label lblTreePreSets;
         private System.Windows.Forms.ToolStripMenuItem visitHelpWikiToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem whatsNewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem torrentZipToolStripMenuItem;
@@ -1085,6 +969,8 @@
         private UIElements.UIGameInfo ucGameInfo;
         private UIElements.UIRomGrid grdRom;
         private UIElements.UIGameGrid grdGame;
+
+        private UIElements.UISideButtons sideButtons;
     }
 }
 

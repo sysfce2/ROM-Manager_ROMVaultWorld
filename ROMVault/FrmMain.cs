@@ -83,17 +83,6 @@ namespace ROMVault
 
             ReadDefaults();
 
-            btnUpdateDats.BackgroundImage = rvImages.GetBitmap("btnUpdateDats_Enabled");
-            btnScanRoms.BackgroundImage = rvImages.GetBitmap("btnScanRoms_Enabled");
-            btnFindFixes.BackgroundImage = rvImages.GetBitmap("btnFindFixes_Enabled");
-            btnFixFiles.BackgroundImage = rvImages.GetBitmap("btnFixFiles_Enabled");
-            btnReport.BackgroundImage = rvImages.GetBitmap("btnReport_Enabled");
-
-            btnDefault1.BackgroundImage = rvImages.GetBitmap("default1");
-            btnDefault2.BackgroundImage = rvImages.GetBitmap("default2");
-            btnDefault3.BackgroundImage = rvImages.GetBitmap("default3");
-            btnDefault4.BackgroundImage = rvImages.GetBitmap("default4");
-
             ucGameInfo.AddGameMetaData();
             txtDefault = $@"RomVault ({Program.strVersion}) {Application.StartupPath}";
             settext("");
@@ -290,19 +279,9 @@ namespace ROMVault
             chkBoxShowMIA.Checked = Settings.rvSettings.chkBoxShowMIA;
             chkBoxShowMerged.Checked = Settings.rvSettings.chkBoxShowMerged;
 
-            tooltip.SetToolTip(btnDefault1, "Right Click: Save Tree Settings\nLeft Click: Load Tree Settings");
-            tooltip.SetToolTip(btnDefault2, "Right Click: Save Tree Settings\nLeft Click: Load Tree Settings");
-            tooltip.SetToolTip(btnDefault3, "Right Click: Save Tree Settings\nLeft Click: Load Tree Settings");
-            tooltip.SetToolTip(btnDefault4, "Right Click: Save Tree Settings\nLeft Click: Load Tree Settings");
-
-            tooltip.SetToolTip(btnUpdateDats, "Left Click: Dat Update\nShift Left Click: Full Dat Rescan\n\nRight Click: Open DatVault");
-            tooltip.SetToolTip(btnFixFiles, "Left Click: Fix Files\nRight Click: Scan / Find Fix / Fix");
-
             ExtHelper.AddIns(this, isWorking, UpdateDats, updateMIACallback);
 
             TabArtworkInitialize();
-
-            SetButtonPosLeft();
 
             InitGameGridMenu();
 
@@ -895,7 +874,8 @@ namespace ROMVault
 
 
         #region sideButtons
-        private void BtnUpdateDatsMouseUp(object sender, MouseEventArgs e)
+
+        private void sideButtons_BtnUpdateDats_MouseUp(object sender, MouseEventArgs e)
         {
             RootDirsCreate.CheckDatRoot();
             if (e.Button == MouseButtons.Right)
@@ -911,17 +891,18 @@ namespace ROMVault
             UpdateDats();
             Finish();
         }
-        private void BtnScanRomsClick(object sender, EventArgs e)
+
+        private void sideButtons_BtnScanRoms_MouseUp(object sender, MouseEventArgs e)
         {
             ScanRoms(EScanLevel.Level2);
         }
 
-        private void btnFindFixes_MouseUp(object sender, MouseEventArgs e)
+        private void sideButtons_BtnFindFixes_MouseUp(object sender, MouseEventArgs e)
         {
             FindFixes(Control.ModifierKeys == (Keys.Shift | Keys.Control));
         }
 
-        private void BtnFixFilesMouseUp(object sender, MouseEventArgs e)
+        private void sideButtons_BtnFixFiles_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -931,10 +912,44 @@ namespace ROMVault
 
             FixFiles();
         }
-        private void BtnReportMouseUp(object sender, MouseEventArgs e)
+
+        private void sideButtons_BtnReport_MouseUp(object sender, MouseEventArgs e)
         {
             MakeFixDat(DB.DirRoot.Child(0), e.Button == MouseButtons.Left);
         }
+
+        private void sideButtons_BtnDefault1_MouseUp(object sender, MouseEventArgs e)
+        {
+            treeDefault(e.Button == MouseButtons.Right, 1);
+        }
+
+        private void sideButtons_BtnDefault2_MouseUp(object sender, MouseEventArgs e)
+        {
+            treeDefault(e.Button == MouseButtons.Right, 2);
+        }
+
+        private void sideButtons_BtnDefault3_MouseUp(object sender, MouseEventArgs e)
+        {
+            treeDefault(e.Button == MouseButtons.Right, 3);
+        }
+
+        private void sideButtons_BtnDefault4_MouseUp(object sender, MouseEventArgs e)
+        {
+            treeDefault(e.Button == MouseButtons.Right, 4);
+        }
+
+        public void treeDefault(bool set, int index)
+        {
+            DatTreeStatusStore dtss = new DatTreeStatusStore();
+            if (set)
+            {
+                dtss.write(index);
+                return;
+            }
+            dtss.read(index);
+            ctrRvTree.Setup(ref DB.DirRoot, true);
+        }
+
         #endregion
 
 
@@ -1151,22 +1166,7 @@ namespace ROMVault
                     continue;
                 menuItem.Enabled = false;
             }
-            btnUpdateDats.Enabled = false;
-            btnScanRoms.Enabled = false;
-            btnFindFixes.Enabled = false;
-            btnFixFiles.Enabled = false;
-            btnReport.Enabled = false;
-
-            btnDefault1.Enabled = false;
-            btnDefault2.Enabled = false;
-            btnDefault3.Enabled = false;
-            btnDefault4.Enabled = false;
-
-            btnUpdateDats.BackgroundImage = rvImages.GetBitmap("btnUpdateDats_Disabled");
-            btnScanRoms.BackgroundImage = rvImages.GetBitmap("btnScanRoms_Disabled");
-            btnFindFixes.BackgroundImage = rvImages.GetBitmap("btnFindFixes_Disabled");
-            btnFixFiles.BackgroundImage = rvImages.GetBitmap("btnFixFiles_Disabled");
-            btnReport.BackgroundImage = rvImages.GetBitmap("btnReport_Disabled");
+            sideButtons.Disable();
         }
         private void Finish()
         {
@@ -1185,22 +1185,8 @@ namespace ROMVault
                     menuItem.Enabled = true;
             }
 
-            btnUpdateDats.BackgroundImage = rvImages.GetBitmap("btnUpdateDats_Enabled");
-            btnScanRoms.BackgroundImage = rvImages.GetBitmap("btnScanRoms_Enabled");
-            btnFindFixes.BackgroundImage = rvImages.GetBitmap("btnFindFixes_Enabled");
-            btnFixFiles.BackgroundImage = rvImages.GetBitmap("btnFixFiles_Enabled");
-            btnReport.BackgroundImage = rvImages.GetBitmap("btnReport_Enabled");
-
-            btnDefault1.Enabled = true;
-            btnDefault2.Enabled = true;
-            btnDefault3.Enabled = true;
-            btnDefault4.Enabled = true;
-
-            btnUpdateDats.Enabled = true;
-            btnScanRoms.Enabled = true;
-            btnFindFixes.Enabled = true;
-            btnFixFiles.Enabled = true;
-            btnReport.Enabled = true;
+            sideButtons.Enable();
+         
 
             timer1.Enabled = false;
             DatSetSelected(ctrRvTree.Selected);
@@ -1241,54 +1227,6 @@ namespace ROMVault
 
         #endregion
 
-        private void btnDefault1_MouseDown(object sender, MouseEventArgs e)
-        {
-            treeDefault(e.Button == MouseButtons.Right, 1);
-        }
-
-        private void btnDefault2_MouseDown(object sender, MouseEventArgs e)
-        {
-            treeDefault(e.Button == MouseButtons.Right, 2);
-        }
-
-        private void btnDefault3_MouseDown(object sender, MouseEventArgs e)
-        {
-            treeDefault(e.Button == MouseButtons.Right, 3);
-        }
-
-        private void btnDefault4_MouseDown(object sender, MouseEventArgs e)
-        {
-            treeDefault(e.Button == MouseButtons.Right, 4);
-        }
-
-        public void treeDefault(bool set, int index)
-        {
-            DatTreeStatusStore dtss = new DatTreeStatusStore();
-            if (set)
-            {
-                dtss.write(index);
-                return;
-            }
-            dtss.read(index);
-            ctrRvTree.Setup(ref DB.DirRoot, true);
-        }
-
-        private void splitToolBarMain_Panel1_Resize(object sender, EventArgs e)
-        {
-            SetButtonPosLeft();
-        }
-        private void SetButtonPosLeft()
-        {
-            int pH = splitToolBarMain.Panel1.Height;
-            if (pH < 550)
-                pH = 550;
-
-            lblTreePreSets.Top = pH - 98;
-            btnDefault1.Top = pH - 82;
-            btnDefault2.Top = pH - 82;
-            btnDefault3.Top = pH - 42;
-            btnDefault4.Top = pH - 42;
-        }
 
         private void visitHelpWikiToolStripMenuItem_Click(object sender, EventArgs e)
         {
