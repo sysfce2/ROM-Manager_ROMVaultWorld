@@ -1,6 +1,6 @@
-﻿namespace ROMVault
+﻿namespace ROMVault.UIElements
 {
-    partial class RvTree
+    partial class UITree
     {
         /// <summary> 
         /// Required designer variable.

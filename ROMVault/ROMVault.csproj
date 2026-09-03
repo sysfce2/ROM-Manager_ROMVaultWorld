@@ -50,8 +50,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>rvImages1.resx</DependentUpon>
     </Compile>
-    <Compile Update="UIElements\rvTree.Designer.cs">
-        <DependentUpon>rvTree.cs</DependentUpon>
+    <Compile Update="UIElements\UITree.Designer.cs">
+        <DependentUpon>UITree.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 

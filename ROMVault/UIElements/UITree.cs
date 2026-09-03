@@ -12,10 +12,10 @@ using RomVaultCore;
 using RVUtils;
 using RomVaultCore.RvDB;
 
-namespace ROMVault
+namespace ROMVault.UIElements
 {
 
-    public partial class RvTree : UserControl
+    public partial class UITree : UserControl
     {
         public bool CoreActive;
 
@@ -37,7 +37,7 @@ namespace ROMVault
         private readonly Font tFont = new Font("Microsoft Sans Serif", 8);
         private readonly Font tFont1 = new Font("Microsoft Sans Serif", 7);
 
-        public RvTree()
+        public UITree()
         {
             InitializeComponent();
         }

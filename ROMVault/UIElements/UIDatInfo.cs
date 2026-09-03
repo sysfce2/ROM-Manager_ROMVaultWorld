@@ -4,7 +4,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace ROMVault
+namespace ROMVault.UIElements
 {
     public partial class UIDatInfo : UserControl
     {

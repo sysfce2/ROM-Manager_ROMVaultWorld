@@ -271,13 +271,6 @@ namespace ROMVault
             _mnuToSortDown.Click += MnuToSortDown;
 
 
-            chkBoxShowComplete.Checked = Settings.rvSettings.chkBoxShowComplete;
-            chkBoxShowPartial.Checked = Settings.rvSettings.chkBoxShowPartial;
-            chkBoxShowEmpty.Checked = Settings.rvSettings.chkBoxShowEmpty;
-            chkBoxShowFixes.Checked = Settings.rvSettings.chkBoxShowFixes;
-            chkBoxShowMIA.Checked = Settings.rvSettings.chkBoxShowMIA;
-            chkBoxShowMerged.Checked = Settings.rvSettings.chkBoxShowMerged;
-
             ExtHelper.AddIns(this, isWorking, UpdateDats, updateMIACallback);
 
 
@@ -360,15 +353,7 @@ namespace ROMVault
             if (chkLeft < 430)
                 chkLeft = 430;
 
-            chkBoxShowComplete.Left = chkLeft;
-            chkBoxShowPartial.Left = chkLeft;
-            chkBoxShowEmpty.Left = chkLeft;
-            chkBoxShowFixes.Left = chkLeft;
-            chkBoxShowMIA.Left = chkLeft;
-            chkBoxShowMerged.Left = chkLeft;
-            txtFilter.Left = chkLeft;
-            btnClear.Left = chkLeft + txtFilter.Width + 2;
-
+            ctrFilter.Left = chkLeft;
             ucGameInfo.Width = chkLeft - ucGameInfo.Left - 10;
         }
         protected override void ScaleControl(SizeF factor, BoundsSpecified specified)
@@ -874,9 +859,6 @@ namespace ROMVault
             FrmHelpAbout fha = new FrmHelpAbout();
             fha.ShowDialog(this);
             fha.Dispose();
-#if webUI
-            WebUI();
-#endif
         }
 
 
@@ -964,85 +946,6 @@ namespace ROMVault
 
 
         #region TopRight
-
-        private void ChkBoxShowCompleteCheckedChanged(object sender, EventArgs e)
-        {
-            if (Settings.rvSettings.chkBoxShowComplete != this.chkBoxShowComplete.Checked)
-            {
-                Settings.rvSettings.chkBoxShowComplete = this.chkBoxShowComplete.Checked;
-                Settings.WriteConfig();
-                DatSetSelected(ctrRvTree.Selected);
-            }
-        }
-
-        private void ChkBoxShowPartialCheckedChanged(object sender, EventArgs e)
-        {
-            if (Settings.rvSettings.chkBoxShowPartial != this.chkBoxShowPartial.Checked)
-            {
-                Settings.rvSettings.chkBoxShowPartial = this.chkBoxShowPartial.Checked;
-                Settings.WriteConfig();
-                DatSetSelected(ctrRvTree.Selected);
-            }
-        }
-        private void chkBoxShowEmptyCheckedChanged(object sender, EventArgs e)
-        {
-            if (Settings.rvSettings.chkBoxShowEmpty != this.chkBoxShowEmpty.Checked)
-            {
-                Settings.rvSettings.chkBoxShowEmpty = this.chkBoxShowEmpty.Checked;
-                Settings.WriteConfig();
-                DatSetSelected(ctrRvTree.Selected);
-            }
-        }
-
-        private void ChkBoxShowFixesCheckedChanged(object sender, EventArgs e)
-        {
-            if (Settings.rvSettings.chkBoxShowFixes != this.chkBoxShowFixes.Checked)
-            {
-                Settings.rvSettings.chkBoxShowFixes = this.chkBoxShowFixes.Checked;
-                Settings.WriteConfig();
-                DatSetSelected(ctrRvTree.Selected);
-            }
-        }
-
-
-        private void chkBoxShowMIA_CheckedChanged(object sender, EventArgs e)
-        {
-            if (Settings.rvSettings.chkBoxShowMIA != this.chkBoxShowMIA.Checked)
-            {
-                Settings.rvSettings.chkBoxShowMIA = this.chkBoxShowMIA.Checked;
-                Settings.WriteConfig();
-                DatSetSelected(ctrRvTree.Selected);
-            }
-        }
-
-        private void ChkBoxShowMergedCheckedChanged(object sender, EventArgs e)
-        {
-            if (Settings.rvSettings.chkBoxShowMerged != this.chkBoxShowMerged.Checked)
-            {
-                Settings.rvSettings.chkBoxShowMerged = this.chkBoxShowMerged.Checked;
-                Settings.WriteConfig();
-                DatSetSelected(ctrRvTree.Selected);
-            }
-        }
-
-
-
-        private void BtnClear_Click(object sender, EventArgs e)
-        {
-            txtFilter.Text = "";
-            grdGame.FilterText = "";
-            if (grdGame.gameGridSource != null)
-                grdGame.UpdateGameGrid(grdGame.gameGridSource);
-        }
-
-
-        private void TxtFilter_TextChanged(object sender, EventArgs e)
-        {
-            grdGame.FilterText = txtFilter.Text;
-            if (grdGame.gameGridSource != null)
-                grdGame.UpdateGameGrid(grdGame.gameGridSource);
-            txtFilter.Focus();
-        }
 
 
         private void picPayPal_Click(object sender, EventArgs e)
@@ -1301,7 +1204,7 @@ namespace ROMVault
                 if (defaults.splitDatInfoGameInfo_pos != int.MinValue) this.splitDatInfoGameInfo.SplitterDistance = defaults.splitDatInfoGameInfo_pos;
                 if (defaults.splitGameListRomList_pos != int.MinValue) this.splitGameListRomList.SplitterDistance = defaults.splitGameListRomList_pos;
                 if (defaults.splitListArt_pos != int.MinValue) this.splitListArt.SplitterDistance = defaults.splitListArt_pos;
-      
+
 
                 grdGame.SetDefaults(defaults);
                 grdRom.SetDefaults(defaults);
@@ -1331,7 +1234,7 @@ namespace ROMVault
             df.splitDatInfoGameInfo_pos = this.splitDatInfoGameInfo.SplitterDistance;
             df.splitGameListRomList_pos = this.splitGameListRomList.SplitterDistance;
             df.splitListArt_pos = this.splitListArt.SplitterDistance;
-      
+
 
             grdGame.PutDefaults(df);
             grdRom.PutDefaults(df);
@@ -1614,5 +1517,16 @@ namespace ROMVault
 
         #endregion
 
+        private void ctrFilter_CheckedChanged(object sender, EventArgs e)
+        {
+            DatSetSelected(ctrRvTree.Selected);
+        }
+
+        private void ctrFilter_FilterTextChanged(object sender, UIElements.UIFilterOptions.FilterTextChangedEventArgs e)
+        {
+            grdGame.FilterText = e.FilterText;
+            if (grdGame.gameGridSource != null)
+                grdGame.UpdateGameGrid(grdGame.gameGridSource);
+        }
     }
 }

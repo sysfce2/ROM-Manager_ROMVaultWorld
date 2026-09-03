@@ -1,4 +1,4 @@
-﻿namespace ROMVault
+﻿namespace ROMVault.UIElements
 {
     partial class UIDatInfo
     {

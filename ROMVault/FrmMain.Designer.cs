@@ -34,18 +34,11 @@
             sideButtons = new ROMVault.UIElements.UISideButtons();
             splitDatInfoGameInfo = new System.Windows.Forms.SplitContainer();
             splitDatInfoTree = new System.Windows.Forms.SplitContainer();
-            ucDatInfo = new UIDatInfo();
-            ctrRvTree = new RvTree();
+            ucDatInfo = new ROMVault.UIElements.UIDatInfo();
+            ctrRvTree = new ROMVault.UIElements.UITree();
             splitGameInfoLists = new System.Windows.Forms.SplitContainer();
+            ctrFilter = new ROMVault.UIElements.UIFilterOptions();
             ucGameInfo = new ROMVault.UIElements.UIGameInfo();
-            chkBoxShowEmpty = new System.Windows.Forms.CheckBox();
-            chkBoxShowMIA = new System.Windows.Forms.CheckBox();
-            btnClear = new System.Windows.Forms.Button();
-            txtFilter = new System.Windows.Forms.TextBox();
-            chkBoxShowMerged = new System.Windows.Forms.CheckBox();
-            chkBoxShowFixes = new System.Windows.Forms.CheckBox();
-            chkBoxShowPartial = new System.Windows.Forms.CheckBox();
-            chkBoxShowComplete = new System.Windows.Forms.CheckBox();
             splitListArt = new System.Windows.Forms.SplitContainer();
             splitGameListRomList = new System.Windows.Forms.SplitContainer();
             grdGame = new ROMVault.UIElements.UIGameGrid();
@@ -216,15 +209,8 @@
             // 
             // splitGameInfoLists.Panel1
             // 
+            splitGameInfoLists.Panel1.Controls.Add(ctrFilter);
             splitGameInfoLists.Panel1.Controls.Add(ucGameInfo);
-            splitGameInfoLists.Panel1.Controls.Add(chkBoxShowEmpty);
-            splitGameInfoLists.Panel1.Controls.Add(chkBoxShowMIA);
-            splitGameInfoLists.Panel1.Controls.Add(btnClear);
-            splitGameInfoLists.Panel1.Controls.Add(txtFilter);
-            splitGameInfoLists.Panel1.Controls.Add(chkBoxShowMerged);
-            splitGameInfoLists.Panel1.Controls.Add(chkBoxShowFixes);
-            splitGameInfoLists.Panel1.Controls.Add(chkBoxShowPartial);
-            splitGameInfoLists.Panel1.Controls.Add(chkBoxShowComplete);
             splitGameInfoLists.Panel1.Resize += splitContainer4_Panel1_Resize;
             // 
             // splitGameInfoLists.Panel2
@@ -234,106 +220,21 @@
             splitGameInfoLists.SplitterDistance = 148;
             splitGameInfoLists.TabIndex = 0;
             // 
+            // ctrFilter
+            // 
+            ctrFilter.Location = new System.Drawing.Point(541, 3);
+            ctrFilter.Name = "ctrFilter";
+            ctrFilter.Size = new System.Drawing.Size(183, 133);
+            ctrFilter.TabIndex = 22;
+            ctrFilter.CheckedChanged += ctrFilter_CheckedChanged;
+            ctrFilter.FilterTextChanged += ctrFilter_FilterTextChanged;
+            // 
             // ucGameInfo
             // 
             ucGameInfo.Location = new System.Drawing.Point(3, 0);
             ucGameInfo.Name = "ucGameInfo";
             ucGameInfo.Size = new System.Drawing.Size(532, 147);
             ucGameInfo.TabIndex = 21;
-            // 
-            // chkBoxShowEmpty
-            // 
-            chkBoxShowEmpty.AutoSize = true;
-            chkBoxShowEmpty.Checked = true;
-            chkBoxShowEmpty.CheckState = System.Windows.Forms.CheckState.Checked;
-            chkBoxShowEmpty.Location = new System.Drawing.Point(547, 46);
-            chkBoxShowEmpty.Name = "chkBoxShowEmpty";
-            chkBoxShowEmpty.Size = new System.Drawing.Size(92, 19);
-            chkBoxShowEmpty.TabIndex = 20;
-            chkBoxShowEmpty.Text = "Show Empty";
-            chkBoxShowEmpty.UseVisualStyleBackColor = true;
-            chkBoxShowEmpty.CheckedChanged += chkBoxShowEmptyCheckedChanged;
-            // 
-            // chkBoxShowMIA
-            // 
-            chkBoxShowMIA.AutoSize = true;
-            chkBoxShowMIA.Checked = true;
-            chkBoxShowMIA.CheckState = System.Windows.Forms.CheckState.Checked;
-            chkBoxShowMIA.Location = new System.Drawing.Point(547, 78);
-            chkBoxShowMIA.Name = "chkBoxShowMIA";
-            chkBoxShowMIA.Size = new System.Drawing.Size(80, 19);
-            chkBoxShowMIA.TabIndex = 19;
-            chkBoxShowMIA.Text = "Show MIA";
-            chkBoxShowMIA.UseVisualStyleBackColor = true;
-            chkBoxShowMIA.CheckedChanged += chkBoxShowMIA_CheckedChanged;
-            // 
-            // btnClear
-            // 
-            btnClear.Location = new System.Drawing.Point(664, 113);
-            btnClear.Name = "btnClear";
-            btnClear.Size = new System.Drawing.Size(28, 22);
-            btnClear.TabIndex = 18;
-            btnClear.Text = "X";
-            btnClear.UseVisualStyleBackColor = true;
-            btnClear.Click += BtnClear_Click;
-            // 
-            // txtFilter
-            // 
-            txtFilter.Location = new System.Drawing.Point(549, 114);
-            txtFilter.Name = "txtFilter";
-            txtFilter.Size = new System.Drawing.Size(109, 23);
-            txtFilter.TabIndex = 17;
-            txtFilter.TextChanged += TxtFilter_TextChanged;
-            // 
-            // chkBoxShowMerged
-            // 
-            chkBoxShowMerged.AutoSize = true;
-            chkBoxShowMerged.Location = new System.Drawing.Point(547, 94);
-            chkBoxShowMerged.Name = "chkBoxShowMerged";
-            chkBoxShowMerged.Size = new System.Drawing.Size(158, 19);
-            chkBoxShowMerged.TabIndex = 8;
-            chkBoxShowMerged.Text = "Show Merged / Deduped";
-            chkBoxShowMerged.UseVisualStyleBackColor = true;
-            chkBoxShowMerged.CheckedChanged += ChkBoxShowMergedCheckedChanged;
-            // 
-            // chkBoxShowFixes
-            // 
-            chkBoxShowFixes.AutoSize = true;
-            chkBoxShowFixes.Checked = true;
-            chkBoxShowFixes.CheckState = System.Windows.Forms.CheckState.Checked;
-            chkBoxShowFixes.Location = new System.Drawing.Point(547, 62);
-            chkBoxShowFixes.Name = "chkBoxShowFixes";
-            chkBoxShowFixes.Size = new System.Drawing.Size(83, 19);
-            chkBoxShowFixes.TabIndex = 7;
-            chkBoxShowFixes.Text = "Show Fixes";
-            chkBoxShowFixes.UseVisualStyleBackColor = true;
-            chkBoxShowFixes.CheckedChanged += ChkBoxShowFixesCheckedChanged;
-            // 
-            // chkBoxShowPartial
-            // 
-            chkBoxShowPartial.AutoSize = true;
-            chkBoxShowPartial.Checked = true;
-            chkBoxShowPartial.CheckState = System.Windows.Forms.CheckState.Checked;
-            chkBoxShowPartial.Location = new System.Drawing.Point(547, 30);
-            chkBoxShowPartial.Name = "chkBoxShowPartial";
-            chkBoxShowPartial.Size = new System.Drawing.Size(91, 19);
-            chkBoxShowPartial.TabIndex = 6;
-            chkBoxShowPartial.Text = "Show Partial";
-            chkBoxShowPartial.UseVisualStyleBackColor = true;
-            chkBoxShowPartial.CheckedChanged += ChkBoxShowPartialCheckedChanged;
-            // 
-            // chkBoxShowComplete
-            // 
-            chkBoxShowComplete.AutoSize = true;
-            chkBoxShowComplete.Checked = true;
-            chkBoxShowComplete.CheckState = System.Windows.Forms.CheckState.Checked;
-            chkBoxShowComplete.Location = new System.Drawing.Point(547, 14);
-            chkBoxShowComplete.Name = "chkBoxShowComplete";
-            chkBoxShowComplete.Size = new System.Drawing.Size(110, 19);
-            chkBoxShowComplete.TabIndex = 5;
-            chkBoxShowComplete.Text = "Show Complete";
-            chkBoxShowComplete.UseVisualStyleBackColor = true;
-            chkBoxShowComplete.CheckedChanged += ChkBoxShowCompleteCheckedChanged;
             // 
             // splitListArt
             // 
@@ -653,7 +554,6 @@
             ((System.ComponentModel.ISupportInitialize)splitDatInfoTree).EndInit();
             splitDatInfoTree.ResumeLayout(false);
             splitGameInfoLists.Panel1.ResumeLayout(false);
-            splitGameInfoLists.Panel1.PerformLayout();
             splitGameInfoLists.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitGameInfoLists).EndInit();
             splitGameInfoLists.ResumeLayout(false);
@@ -678,13 +578,9 @@
         private System.Windows.Forms.SplitContainer splitDatInfoGameInfo;
         private System.Windows.Forms.SplitContainer splitDatInfoTree;
         private System.Windows.Forms.SplitContainer splitGameInfoLists;
-        private System.Windows.Forms.CheckBox chkBoxShowMerged;
-        private System.Windows.Forms.CheckBox chkBoxShowFixes;
-        private System.Windows.Forms.CheckBox chkBoxShowPartial;
-        private System.Windows.Forms.CheckBox chkBoxShowComplete;
 
         private System.Windows.Forms.SplitContainer splitGameListRomList;
-        private RvTree ctrRvTree;
+        private ROMVault.UIElements.UITree ctrRvTree;
         private System.Windows.Forms.DataGridViewImageColumn dataGridViewImageColumn1;
         private System.Windows.Forms.DataGridViewImageColumn dataGridViewImageColumn2;
         private System.Windows.Forms.DataGridViewImageColumn dataGridViewImageColumn3;
@@ -706,8 +602,6 @@
         private System.Windows.Forms.SplitContainer splitListArt;
         private System.Windows.Forms.ToolStripMenuItem colorKeyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addToSortToolStripMenuItem;
-        private System.Windows.Forms.Button btnClear;
-        private System.Windows.Forms.TextBox txtFilter;
         private System.Windows.Forms.ToolStripMenuItem romVaultSettingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem directorySettingsToolStripMenuItem;
         private System.Windows.Forms.Timer timer1;
@@ -717,16 +611,15 @@
         private System.Windows.Forms.ToolStripMenuItem whatsNewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem torrentZipToolStripMenuItem;
         private System.Windows.Forms.ToolTip tooltip;
-        private System.Windows.Forms.CheckBox chkBoxShowMIA;
         private System.Windows.Forms.ToolStripMenuItem directoryMappingsToolStripMenuItem;
-        private System.Windows.Forms.CheckBox chkBoxShowEmpty;
-        private UIDatInfo ucDatInfo;
+        private UIElements.UIDatInfo ucDatInfo;
         private UIElements.UIGameInfo ucGameInfo;
         private UIElements.UIRomGrid grdRom;
         private UIElements.UIGameGrid grdGame;
 
         private UIElements.UISideButtons sideButtons;
-        private  UIElements.UISidePannel sidePannel;
+        private UIElements.UISidePannel sidePannel;
+        private UIElements.UIFilterOptions ctrFilter;
     }
 }
 
