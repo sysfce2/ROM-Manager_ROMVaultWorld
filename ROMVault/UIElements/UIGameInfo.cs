@@ -86,6 +86,7 @@ namespace ROMVault.UIElements
         public UIGameInfo()
         {
             InitializeComponent();
+            AddGameMetaData();
         }
 
 
@@ -153,7 +154,7 @@ namespace ROMVault.UIElements
         }
 
 
-        public void AddGameMetaData()
+        private void AddGameMetaData()
         {
             _buttonGameName = AddLinkLabel();
             AddTextBox(0, "Name", 6, 84, out _labelGameName, out _textGameName);

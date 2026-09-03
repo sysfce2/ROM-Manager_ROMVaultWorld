@@ -50,22 +50,7 @@
             splitGameListRomList = new System.Windows.Forms.SplitContainer();
             grdGame = new ROMVault.UIElements.UIGameGrid();
             grdRom = new ROMVault.UIElements.UIRomGrid();
-            tabSideArtwork = new System.Windows.Forms.TabControl();
-            tabArtWork = new System.Windows.Forms.TabPage();
-            picLogo = new System.Windows.Forms.PictureBox();
-            picArtwork = new System.Windows.Forms.PictureBox();
-            tabMedium = new System.Windows.Forms.TabPage();
-            picMedium2 = new System.Windows.Forms.PictureBox();
-            picMedium1 = new System.Windows.Forms.PictureBox();
-            tabScreens = new System.Windows.Forms.TabPage();
-            picScreenShot = new System.Windows.Forms.PictureBox();
-            picScreenTitle = new System.Windows.Forms.PictureBox();
-            tabInfo = new System.Windows.Forms.TabPage();
-            trbFontSize = new System.Windows.Forms.TrackBar();
-            txtInfo = new System.Windows.Forms.TextBox();
-            tabInfo2 = new System.Windows.Forms.TabPage();
-            trbFontSize2 = new System.Windows.Forms.TrackBar();
-            txtInfo2 = new System.Windows.Forms.TextBox();
+            sidePannel = new ROMVault.UIElements.UISidePannel();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
             tsmUpdateDATs = new System.Windows.Forms.ToolStripMenuItem();
             updateNewDATsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -120,20 +105,6 @@
             splitGameListRomList.Panel1.SuspendLayout();
             splitGameListRomList.Panel2.SuspendLayout();
             splitGameListRomList.SuspendLayout();
-            tabSideArtwork.SuspendLayout();
-            tabArtWork.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)picArtwork).BeginInit();
-            tabMedium.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)picMedium2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)picMedium1).BeginInit();
-            tabScreens.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)picScreenShot).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)picScreenTitle).BeginInit();
-            tabInfo.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)trbFontSize).BeginInit();
-            tabInfo2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)trbFontSize2).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -376,7 +347,7 @@
             // 
             // splitListArt.Panel2
             // 
-            splitListArt.Panel2.Controls.Add(tabSideArtwork);
+            splitListArt.Panel2.Controls.Add(sidePannel);
             splitListArt.Size = new System.Drawing.Size(762, 573);
             splitListArt.SplitterDistance = 593;
             splitListArt.TabIndex = 1;
@@ -415,197 +386,13 @@
             grdRom.Size = new System.Drawing.Size(593, 325);
             grdRom.TabIndex = 0;
             // 
-            // tabSideArtwork
+            // sidePannel
             // 
-            tabSideArtwork.Controls.Add(tabArtWork);
-            tabSideArtwork.Controls.Add(tabMedium);
-            tabSideArtwork.Controls.Add(tabScreens);
-            tabSideArtwork.Controls.Add(tabInfo);
-            tabSideArtwork.Controls.Add(tabInfo2);
-            tabSideArtwork.Dock = System.Windows.Forms.DockStyle.Fill;
-            tabSideArtwork.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
-            tabSideArtwork.Location = new System.Drawing.Point(0, 0);
-            tabSideArtwork.Name = "tabSideArtwork";
-            tabSideArtwork.SelectedIndex = 0;
-            tabSideArtwork.Size = new System.Drawing.Size(165, 573);
-            tabSideArtwork.TabIndex = 0;
-            // 
-            // tabArtWork
-            // 
-            tabArtWork.BackColor = System.Drawing.SystemColors.Control;
-            tabArtWork.Controls.Add(picLogo);
-            tabArtWork.Controls.Add(picArtwork);
-            tabArtWork.Location = new System.Drawing.Point(4, 22);
-            tabArtWork.Name = "tabArtWork";
-            tabArtWork.Padding = new System.Windows.Forms.Padding(3);
-            tabArtWork.Size = new System.Drawing.Size(157, 547);
-            tabArtWork.TabIndex = 0;
-            tabArtWork.Text = "ArtWork";
-            tabArtWork.Resize += tabArtWork_Resize;
-            // 
-            // picLogo
-            // 
-            picLogo.BackColor = System.Drawing.Color.White;
-            picLogo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            picLogo.Location = new System.Drawing.Point(14, 197);
-            picLogo.Name = "picLogo";
-            picLogo.Size = new System.Drawing.Size(114, 117);
-            picLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            picLogo.TabIndex = 1;
-            picLogo.TabStop = false;
-            // 
-            // picArtwork
-            // 
-            picArtwork.BackColor = System.Drawing.Color.White;
-            picArtwork.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            picArtwork.Location = new System.Drawing.Point(13, 60);
-            picArtwork.Name = "picArtwork";
-            picArtwork.Size = new System.Drawing.Size(116, 104);
-            picArtwork.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            picArtwork.TabIndex = 0;
-            picArtwork.TabStop = false;
-            // 
-            // tabMedium
-            // 
-            tabMedium.BackColor = System.Drawing.SystemColors.Control;
-            tabMedium.Controls.Add(picMedium2);
-            tabMedium.Controls.Add(picMedium1);
-            tabMedium.Location = new System.Drawing.Point(4, 22);
-            tabMedium.Name = "tabMedium";
-            tabMedium.Padding = new System.Windows.Forms.Padding(3);
-            tabMedium.Size = new System.Drawing.Size(157, 547);
-            tabMedium.TabIndex = 3;
-            tabMedium.Text = "Medium";
-            tabMedium.Resize += tabMedium_Resize;
-            // 
-            // picMedium2
-            // 
-            picMedium2.BackColor = System.Drawing.Color.White;
-            picMedium2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            picMedium2.Location = new System.Drawing.Point(24, 283);
-            picMedium2.Name = "picMedium2";
-            picMedium2.Size = new System.Drawing.Size(114, 117);
-            picMedium2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            picMedium2.TabIndex = 3;
-            picMedium2.TabStop = false;
-            // 
-            // picMedium1
-            // 
-            picMedium1.BackColor = System.Drawing.Color.White;
-            picMedium1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            picMedium1.Location = new System.Drawing.Point(23, 146);
-            picMedium1.Name = "picMedium1";
-            picMedium1.Size = new System.Drawing.Size(116, 104);
-            picMedium1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            picMedium1.TabIndex = 2;
-            picMedium1.TabStop = false;
-            // 
-            // tabScreens
-            // 
-            tabScreens.BackColor = System.Drawing.SystemColors.Control;
-            tabScreens.Controls.Add(picScreenShot);
-            tabScreens.Controls.Add(picScreenTitle);
-            tabScreens.Location = new System.Drawing.Point(4, 22);
-            tabScreens.Name = "tabScreens";
-            tabScreens.Padding = new System.Windows.Forms.Padding(3);
-            tabScreens.Size = new System.Drawing.Size(157, 547);
-            tabScreens.TabIndex = 1;
-            tabScreens.Text = "Screens";
-            tabScreens.Resize += tabScreens_Resize;
-            // 
-            // picScreenShot
-            // 
-            picScreenShot.BackColor = System.Drawing.Color.White;
-            picScreenShot.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            picScreenShot.Location = new System.Drawing.Point(15, 218);
-            picScreenShot.Name = "picScreenShot";
-            picScreenShot.Size = new System.Drawing.Size(104, 113);
-            picScreenShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            picScreenShot.TabIndex = 1;
-            picScreenShot.TabStop = false;
-            // 
-            // picScreenTitle
-            // 
-            picScreenTitle.BackColor = System.Drawing.Color.White;
-            picScreenTitle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            picScreenTitle.Location = new System.Drawing.Point(15, 69);
-            picScreenTitle.Name = "picScreenTitle";
-            picScreenTitle.Size = new System.Drawing.Size(104, 117);
-            picScreenTitle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            picScreenTitle.TabIndex = 0;
-            picScreenTitle.TabStop = false;
-            // 
-            // tabInfo
-            // 
-            tabInfo.BackColor = System.Drawing.SystemColors.Control;
-            tabInfo.Controls.Add(trbFontSize);
-            tabInfo.Controls.Add(txtInfo);
-            tabInfo.Location = new System.Drawing.Point(4, 22);
-            tabInfo.Name = "tabInfo";
-            tabInfo.Size = new System.Drawing.Size(157, 547);
-            tabInfo.TabIndex = 2;
-            tabInfo.Text = "Info";
-            tabInfo.Resize += tabInfo_Resize;
-            // 
-            // trbFontSize
-            // 
-            trbFontSize.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            trbFontSize.Location = new System.Drawing.Point(0, 512);
-            trbFontSize.Maximum = 15;
-            trbFontSize.Minimum = 3;
-            trbFontSize.Name = "trbFontSize";
-            trbFontSize.Size = new System.Drawing.Size(161, 45);
-            trbFontSize.TabIndex = 1;
-            trbFontSize.Value = 7;
-            trbFontSize.ValueChanged += trbFontSize_ValueChanged;
-            // 
-            // txtInfo
-            // 
-            txtInfo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            txtInfo.Font = new System.Drawing.Font("Consolas", 7F);
-            txtInfo.Location = new System.Drawing.Point(0, 0);
-            txtInfo.Multiline = true;
-            txtInfo.Name = "txtInfo";
-            txtInfo.ReadOnly = true;
-            txtInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            txtInfo.Size = new System.Drawing.Size(157, 509);
-            txtInfo.TabIndex = 0;
-            txtInfo.WordWrap = false;
-            // 
-            // tabInfo2
-            // 
-            tabInfo2.BackColor = System.Drawing.SystemColors.Control;
-            tabInfo2.Controls.Add(trbFontSize2);
-            tabInfo2.Controls.Add(txtInfo2);
-            tabInfo2.Location = new System.Drawing.Point(4, 22);
-            tabInfo2.Name = "tabInfo2";
-            tabInfo2.Size = new System.Drawing.Size(157, 547);
-            tabInfo2.TabIndex = 4;
-            tabInfo2.Text = "Info2";
-            // 
-            // trbFontSize2
-            // 
-            trbFontSize2.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            trbFontSize2.Location = new System.Drawing.Point(0, 512);
-            trbFontSize2.Maximum = 15;
-            trbFontSize2.Minimum = 3;
-            trbFontSize2.Name = "trbFontSize2";
-            trbFontSize2.Size = new System.Drawing.Size(161, 45);
-            trbFontSize2.TabIndex = 3;
-            trbFontSize2.Value = 7;
-            trbFontSize2.ValueChanged += trbFontSize2_ValueChanged;
-            // 
-            // txtInfo2
-            // 
-            txtInfo2.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            txtInfo2.Font = new System.Drawing.Font("Consolas", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            txtInfo2.Location = new System.Drawing.Point(0, 0);
-            txtInfo2.Multiline = true;
-            txtInfo2.Name = "txtInfo2";
-            txtInfo2.ReadOnly = true;
-            txtInfo2.Size = new System.Drawing.Size(157, 509);
-            txtInfo2.TabIndex = 2;
-            txtInfo2.WordWrap = false;
+            sidePannel.Dock = System.Windows.Forms.DockStyle.Fill;
+            sidePannel.Location = new System.Drawing.Point(0, 0);
+            sidePannel.Name = "sidePannel";
+            sidePannel.Size = new System.Drawing.Size(165, 573);
+            sidePannel.TabIndex = 0;
             // 
             // menuStrip1
             // 
@@ -878,22 +665,6 @@
             splitGameListRomList.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitGameListRomList).EndInit();
             splitGameListRomList.ResumeLayout(false);
-            tabSideArtwork.ResumeLayout(false);
-            tabArtWork.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)picLogo).EndInit();
-            ((System.ComponentModel.ISupportInitialize)picArtwork).EndInit();
-            tabMedium.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)picMedium2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)picMedium1).EndInit();
-            tabScreens.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)picScreenShot).EndInit();
-            ((System.ComponentModel.ISupportInitialize)picScreenTitle).EndInit();
-            tabInfo.ResumeLayout(false);
-            tabInfo.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)trbFontSize).EndInit();
-            tabInfo2.ResumeLayout(false);
-            tabInfo2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)trbFontSize2).EndInit();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -933,17 +704,8 @@
         private System.Windows.Forms.ToolStripMenuItem fullReportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fixReportToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitListArt;
-        private System.Windows.Forms.TabControl tabSideArtwork;
-        private System.Windows.Forms.TabPage tabArtWork;
-        private System.Windows.Forms.TabPage tabScreens;
-        private System.Windows.Forms.PictureBox picLogo;
-        private System.Windows.Forms.PictureBox picArtwork;
-        private System.Windows.Forms.PictureBox picScreenShot;
-        private System.Windows.Forms.PictureBox picScreenTitle;
-        private System.Windows.Forms.TabPage tabInfo;
         private System.Windows.Forms.ToolStripMenuItem colorKeyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addToSortToolStripMenuItem;
-        private System.Windows.Forms.TextBox txtInfo;
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.TextBox txtFilter;
         private System.Windows.Forms.ToolStripMenuItem romVaultSettingsToolStripMenuItem;
@@ -954,23 +716,17 @@
         private System.Windows.Forms.ToolStripMenuItem visitHelpWikiToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem whatsNewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem torrentZipToolStripMenuItem;
-        private System.Windows.Forms.TabPage tabMedium;
-        private System.Windows.Forms.PictureBox picMedium2;
-        private System.Windows.Forms.PictureBox picMedium1;
         private System.Windows.Forms.ToolTip tooltip;
         private System.Windows.Forms.CheckBox chkBoxShowMIA;
         private System.Windows.Forms.ToolStripMenuItem directoryMappingsToolStripMenuItem;
         private System.Windows.Forms.CheckBox chkBoxShowEmpty;
-        private System.Windows.Forms.TabPage tabInfo2;
-        private System.Windows.Forms.TextBox txtInfo2;
-        private System.Windows.Forms.TrackBar trbFontSize;
-        private System.Windows.Forms.TrackBar trbFontSize2;
         private UIDatInfo ucDatInfo;
         private UIElements.UIGameInfo ucGameInfo;
         private UIElements.UIRomGrid grdRom;
         private UIElements.UIGameGrid grdGame;
 
         private UIElements.UISideButtons sideButtons;
+        private  UIElements.UISidePannel sidePannel;
     }
 }
 

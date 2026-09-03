@@ -15,54 +15,6 @@ namespace ROMVault
             InitializeComponent();
         }
 
-        private void gbDatInfo_Resize(object sender, EventArgs e)
-        {
-            const int leftPos = 89;
-            int rightPos = (int)(gbDatInfo.Width / _scaleFactorX) - 15;
-
-
-            int width = rightPos - leftPos;
-            int widthB1 = (int)((double)width * 120 / 340);
-            int leftB2 = rightPos - widthB1;
-
-
-            int backD = 97;
-
-            width = (int)(width * _scaleFactorX);
-            widthB1 = (int)(widthB1 * _scaleFactorX);
-            leftB2 = (int)(leftB2 * _scaleFactorX);
-            backD = (int)(backD * _scaleFactorX);
-
-
-            lblDITName.Width = width;
-            lblDITDescription.Width = width;
-
-            lblDITCategory.Width = widthB1;
-            lblDITAuthor.Width = widthB1;
-
-            lblDIVersion.Left = leftB2 - backD;
-            lblDIDate.Left = leftB2 - backD;
-
-            lblDITVersion.Left = leftB2;
-            lblDITVersion.Width = widthB1;
-            lblDITDate.Left = leftB2;
-            lblDITDate.Width = widthB1;
-
-            lblDITPath.Width = width;
-
-            lblDITRomsGot.Width = widthB1;
-            lblDITRomsMissing.Width = widthB1;
-
-            lblDIRomsFixable.Left = leftB2 - backD;
-            lblDIRomsUnknown.Left = leftB2 - backD;
-
-            lblDITRomsFixable.Left = leftB2;
-            lblDITRomsFixable.Width = widthB1;
-            lblDITRomsUnknown.Left = leftB2;
-            lblDITRomsUnknown.Width = widthB1;
-        }
-
-
         public void UpdateDatMetaData(RvFile tDir)
         {
             lblDITName.Text = tDir.Name;
@@ -112,6 +64,55 @@ namespace ROMVault
             lblDITRomsFixable.Text = tDir.DirStatus.CountFixesNeeded().ToRvString();
             lblDITRomsUnknown.Text = (tDir.DirStatus.CountUnknown() + tDir.DirStatus.CountInToSort()).ToRvString();
         }
+
+
+        private void gbDatInfo_Resize(object sender, EventArgs e)
+        {
+            const int leftPos = 89;
+            int rightPos = (int)(gbDatInfo.Width / _scaleFactorX) - 15;
+
+
+            int width = rightPos - leftPos;
+            int widthB1 = (int)((double)width * 120 / 340);
+            int leftB2 = rightPos - widthB1;
+
+
+            int backD = 97;
+
+            width = (int)(width * _scaleFactorX);
+            widthB1 = (int)(widthB1 * _scaleFactorX);
+            leftB2 = (int)(leftB2 * _scaleFactorX);
+            backD = (int)(backD * _scaleFactorX);
+
+
+            lblDITName.Width = width;
+            lblDITDescription.Width = width;
+
+            lblDITCategory.Width = widthB1;
+            lblDITAuthor.Width = widthB1;
+
+            lblDIVersion.Left = leftB2 - backD;
+            lblDIDate.Left = leftB2 - backD;
+
+            lblDITVersion.Left = leftB2;
+            lblDITVersion.Width = widthB1;
+            lblDITDate.Left = leftB2;
+            lblDITDate.Width = widthB1;
+
+            lblDITPath.Width = width;
+
+            lblDITRomsGot.Width = widthB1;
+            lblDITRomsMissing.Width = widthB1;
+
+            lblDIRomsFixable.Left = leftB2 - backD;
+            lblDIRomsUnknown.Left = leftB2 - backD;
+
+            lblDITRomsFixable.Left = leftB2;
+            lblDITRomsFixable.Width = widthB1;
+            lblDITRomsUnknown.Left = leftB2;
+            lblDITRomsUnknown.Width = widthB1;
+        }
+
 
 
         public void SetScaleFactor(SizeF factor)

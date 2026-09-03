@@ -83,7 +83,6 @@ namespace ROMVault
 
             ReadDefaults();
 
-            ucGameInfo.AddGameMetaData();
             txtDefault = $@"RomVault ({Program.strVersion}) {Application.StartupPath}";
             settext("");
             MIA.stme = settext;
@@ -281,7 +280,6 @@ namespace ROMVault
 
             ExtHelper.AddIns(this, isWorking, UpdateDats, updateMIACallback);
 
-            TabArtworkInitialize();
 
             InitGameGridMenu();
 
@@ -295,6 +293,18 @@ namespace ROMVault
             grdGame.updateGameInfo += UpdateGameGrid;
             grdGame.updateDatInfo += UpdateDatInfoUpdate;
             grdGame.MenuClick += OpenMenu;
+
+            sidePannel.DisplaySide += SidePannel_DisplaySide;
+            SidePannel_DisplaySide(false);
+        }
+
+        private void SidePannel_DisplaySide(bool visible)
+        {
+            splitListArt.Panel2Collapsed = !visible;
+            if (visible)
+                splitListArt.Panel2.Show();
+            else
+                splitListArt.Panel2.Hide();
         }
 
         /*
@@ -1186,7 +1196,7 @@ namespace ROMVault
             }
 
             sideButtons.Enable();
-         
+
 
             timer1.Enabled = false;
             DatSetSelected(ctrRvTree.Selected);
@@ -1291,10 +1301,11 @@ namespace ROMVault
                 if (defaults.splitDatInfoGameInfo_pos != int.MinValue) this.splitDatInfoGameInfo.SplitterDistance = defaults.splitDatInfoGameInfo_pos;
                 if (defaults.splitGameListRomList_pos != int.MinValue) this.splitGameListRomList.SplitterDistance = defaults.splitGameListRomList_pos;
                 if (defaults.splitListArt_pos != int.MinValue) this.splitListArt.SplitterDistance = defaults.splitListArt_pos;
-                if (defaults.nfo_FontSize != int.MinValue) trbFontSize.Value = defaults.nfo_FontSize;
+      
 
                 grdGame.SetDefaults(defaults);
                 grdRom.SetDefaults(defaults);
+                sidePannel.SetDefaults(defaults);
             }
         }
 
@@ -1320,10 +1331,11 @@ namespace ROMVault
             df.splitDatInfoGameInfo_pos = this.splitDatInfoGameInfo.SplitterDistance;
             df.splitGameListRomList_pos = this.splitGameListRomList.SplitterDistance;
             df.splitListArt_pos = this.splitListArt.SplitterDistance;
-            df.nfo_FontSize = trbFontSize.Value;
+      
 
             grdGame.PutDefaults(df);
             grdRom.PutDefaults(df);
+            sidePannel.PutDefaults(df);
 
             defaults.WriteDefaults(df);
         }
@@ -1403,7 +1415,7 @@ namespace ROMVault
         public void UpdateGameGrid(RvFile tGame, bool onTimer)
         {
             ucGameInfo.UpdateGameMetaData(tGame);
-            UpdateSidePannel(tGame);
+            sidePannel.UpdateSidePannel(tGame);
             grdRom.UpdateRomGrid(tGame, onTimer);
         }
 
@@ -1414,53 +1426,6 @@ namespace ROMVault
         }
 
 
-        private void UpdateSidePannel(RvFile tGame)
-        {
-
-            if (tGame?.Game != null)
-            {
-
-                bool found = false;
-                string path = tGame.Parent.DatTreeFullName;
-                foreach (EmulatorInfo ei in Settings.rvSettings.EInfo)
-                {
-                    if (path.Length <= 8)
-                        continue;
-
-                    if (!string.Equals(path.Substring(8), ei.TreeDir, StringComparison.CurrentCultureIgnoreCase))
-                        continue;
-
-                    if (string.IsNullOrWhiteSpace(ei.ExtraPath))
-                        continue;
-
-                    if (ei.ExtraPath != null)
-                    {
-                        found = true;
-                        if (ei.ExtraPath.Substring(0, 1) == "%")
-                            LoadMameSLPannels(tGame, ei.ExtraPath.Substring(1));
-                        else
-                            LoadMamePannels(tGame, ei.ExtraPath);
-
-                        break;
-                    }
-                }
-
-                if (!found)
-                    found = LoadNFOPannel(tGame);
-
-                if (!found)
-                    found = LoadC64Pannel(tGame);
-
-                if (!found)
-                    HidePannel();
-
-            }
-
-            else
-            {
-                HidePannel();
-            }
-        }
 
 
         private void MnuGameScan(object sender, EventArgs e)

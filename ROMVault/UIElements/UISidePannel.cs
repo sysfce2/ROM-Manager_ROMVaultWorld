@@ -1,23 +1,107 @@
-﻿using System;
-using System.Drawing;
-using System.IO;
+﻿using RomVaultCore;
 using RomVaultCore.RvDB;
+using RVIO;
+using System;
+using System.Drawing;
+using System.Windows.Forms;
 
-namespace ROMVault
+namespace ROMVault.UIElements
 {
-    public partial class FrmMain
+    public partial class UISidePannel : UserControl
     {
-        private void TabArtworkInitialize()
+
+        public delegate void ShowSide(bool visible);
+
+        public ShowSide DisplaySide;
+
+        public UISidePannel()
         {
-            splitListArt.Panel2Collapsed = true;
-            splitListArt.Panel2.Hide();
+            InitializeComponent();
+
+            ShowPannel(false);
 
             tabArtWork_Resize(null, new EventArgs());
             tabMedium_Resize(null, new EventArgs());
             tabScreens_Resize(null, new EventArgs());
-            tabInfo_Resize(null, new EventArgs());
         }
 
+
+        public void SetDefaults(defaults defaults)
+        {
+            if (defaults.nfo_FontSize != int.MinValue) trbFontSize.Value = defaults.nfo_FontSize;
+        }
+
+        public void PutDefaults(defaults defaults)
+        {
+            defaults.nfo_FontSize = trbFontSize.Value;
+        }
+
+        public void UpdateSidePannel(RvFile tGame)
+        {
+
+            if (tGame?.Game != null)
+            {
+
+                bool found = false;
+                string path = tGame.Parent.DatTreeFullName;
+                foreach (EmulatorInfo ei in Settings.rvSettings.EInfo)
+                {
+                    if (path.Length <= 8)
+                        continue;
+
+                    if (!string.Equals(path.Substring(8), ei.TreeDir, StringComparison.CurrentCultureIgnoreCase))
+                        continue;
+
+                    if (string.IsNullOrWhiteSpace(ei.ExtraPath))
+                        continue;
+
+                    if (ei.ExtraPath != null)
+                    {
+                        found = true;
+                        if (ei.ExtraPath.Substring(0, 1) == "%")
+                            LoadMameSLPannels(tGame, ei.ExtraPath.Substring(1));
+                        else
+                            LoadMamePannels(tGame, ei.ExtraPath);
+
+                        break;
+                    }
+                }
+
+                if (!found)
+                    found = LoadNFOPannel(tGame);
+
+                if (!found)
+                    found = LoadC64Pannel(tGame);
+
+                if (!found)
+                    HidePannel();
+
+            }
+
+            else
+            {
+                HidePannel();
+            }
+        }
+
+        private void ShowPannel(bool show)
+        {
+            DisplaySide?.Invoke(show);
+        }
+
+        private void HidePannel()
+        {
+            ShowPannel(false);
+
+            picArtwork.ClearImage();
+            picLogo.ClearImage();
+            picMedium1.ClearImage();
+            picMedium2.ClearImage();
+            picScreenTitle.ClearImage();
+            picScreenShot.ClearImage();
+            txtInfo.ClearText();
+            txtInfo2.ClearText();
+        }
 
         private void tabArtWork_Resize(object sender, EventArgs e)
         {
@@ -70,10 +154,7 @@ namespace ROMVault
             picScreenShot.Top = (int)(tabScreens.Height * 0.55);
             picScreenShot.Height = (int)(tabScreens.Height * 0.4);
         }
-        private void tabInfo_Resize(object sender, EventArgs e)
-        {
 
-        }
 
         private void trbFontSize_ValueChanged(object sender, EventArgs e)
         {
@@ -160,17 +241,7 @@ namespace ROMVault
             if (titleLoaded || screenLoaded) tabSideArtwork.TabPages.Add(tabScreens);
             if (storyLoaded) tabSideArtwork.TabPages.Add(tabInfo);
 
-            if (artLoaded || logoLoaded || titleLoaded || screenLoaded || storyLoaded)
-            {
-                splitListArt.Panel2Collapsed = false;
-                splitListArt.Panel2.Show();
-            }
-            else
-            {
-                splitListArt.Panel2Collapsed = true;
-                splitListArt.Panel2.Hide();
-            }
-
+            ShowPannel(artLoaded || logoLoaded || titleLoaded || screenLoaded || storyLoaded);
         }
 
         private void LoadMameSLPannels(RvFile tGame, string extraPath)
@@ -225,17 +296,7 @@ namespace ROMVault
             if (titleLoaded || screenLoaded) tabSideArtwork.TabPages.Add(tabScreens);
             if (storyLoaded) tabSideArtwork.TabPages.Add(tabInfo);
 
-            if (artLoaded || logoLoaded || titleLoaded || screenLoaded || storyLoaded)
-            {
-                splitListArt.Panel2Collapsed = false;
-                splitListArt.Panel2.Show();
-            }
-            else
-            {
-                splitListArt.Panel2Collapsed = true;
-                splitListArt.Panel2.Hide();
-            }
-
+            ShowPannel(artLoaded || logoLoaded || titleLoaded || screenLoaded || storyLoaded);
         }
 
         // need to only load new image if the RvFile has changed
@@ -251,21 +312,18 @@ namespace ROMVault
             string ext = Path.GetExtension(tRom.Name).ToLower();
             if (ext != ".png" && ext != ".jpg")
             {
-                splitListArt.Panel2Collapsed = true;
-                splitListArt.Panel2.Hide();
+                ShowPannel(false);
                 return;
             }
             bool loaded = picArtwork.LoadImage(tRom.Parent, tRom.Name);
             if (loaded)
             {
                 tabSideArtwork.TabPages.Add(tabArtWork);
-                splitListArt.Panel2Collapsed = false;
-                splitListArt.Panel2.Show();
+                ShowPannel(true);
             }
             else
             {
-                splitListArt.Panel2Collapsed = true;
-                splitListArt.Panel2.Hide();
+                ShowPannel(false);
             }
         }
 
@@ -288,19 +346,9 @@ namespace ROMVault
             if (artLoaded || logoLoaded) tabSideArtwork.TabPages.Add(tabArtWork);
             if (titleLoaded || screenLoaded) tabSideArtwork.TabPages.Add(tabScreens);
 
-            if (artLoaded || logoLoaded || titleLoaded || screenLoaded)
-            {
-                splitListArt.Panel2Collapsed = false;
-                splitListArt.Panel2.Show();
-                return true;
-            }
-            else
-            {
-                splitListArt.Panel2Collapsed = true;
-                splitListArt.Panel2.Hide();
-                return false;
-            }
-
+            bool showP = (artLoaded || logoLoaded || titleLoaded || screenLoaded);
+            ShowPannel(showP);
+            return showP;
         }
 
         private bool LoadNFOPannel(RvFile tGame)
@@ -324,19 +372,10 @@ namespace ROMVault
                 tabInfo2.Text = "DIZ";
                 tabSideArtwork.TabPages.Add(tabInfo2);
             }
-            if (storyLoaded || storyLoaded2)
-            {
-                splitListArt.Panel2Collapsed = false;
-                splitListArt.Panel2.Show();
-                return true;
-            }
-            else
-            {
-                splitListArt.Panel2Collapsed = true;
-                splitListArt.Panel2.Hide();
-                return false;
-            }
 
+            bool showP = storyLoaded || storyLoaded2;
+            ShowPannel(showP);
+            return showP;
         }
 
 
@@ -387,34 +426,9 @@ namespace ROMVault
             if (titleLoaded || screenLoaded) tabSideArtwork.TabPages.Add(tabScreens);
             if (storyLoaded) tabSideArtwork.TabPages.Add(tabInfo);
 
-            if (artLoaded || logoLoaded || titleLoaded || screenLoaded || storyLoaded || medium1Loaded || medium2Loaded)
-            {
-                splitListArt.Panel2Collapsed = false;
-                splitListArt.Panel2.Show();
-            }
-            else
-            {
-                splitListArt.Panel2Collapsed = true;
-                splitListArt.Panel2.Hide();
-            }
-
+            ShowPannel(artLoaded || logoLoaded || titleLoaded || screenLoaded || storyLoaded || medium1Loaded || medium2Loaded);
         }
 
 
-
-        private void HidePannel()
-        {
-            splitListArt.Panel2Collapsed = true;
-            splitListArt.Panel2.Hide();
-
-            picArtwork.ClearImage();
-            picLogo.ClearImage();
-            picMedium1.ClearImage();
-            picMedium2.ClearImage();
-            picScreenTitle.ClearImage();
-            picScreenShot.ClearImage();
-            txtInfo.ClearText();
-            txtInfo2.ClearText();
-        }
     }
 }

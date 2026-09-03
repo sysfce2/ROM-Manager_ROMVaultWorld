@@ -17,14 +17,14 @@ namespace ROMVault.UIElements
 {
     public delegate void UpdateGameInfo(RvFile tGame,bool onTimer);
     public delegate void PassBackRvFile(RvFile tGame);
-    public delegate void OpenMEnu(RvFile tGame, MouseEventArgs e);
+    public delegate void OpenMenu(RvFile tGame, MouseEventArgs e);
 
     public partial class UIGameGrid : UserControl
     {
         public UpdateGameInfo updateGameInfo;
         public PassBackRvFile updateDatInfo;
         public PassBackRvFile LaunchEmulator;
-        public OpenMEnu MenuClick;
+        public OpenMenu MenuClick;
 
         private enum GameGridColumns
         {
