@@ -170,7 +170,7 @@
             // splitDatInfoTree.Panel1
             // 
             splitDatInfoTree.Panel1.Controls.Add(ucDatInfo);
-            splitDatInfoTree.Panel1.Resize += splitContainer3_Panel1_Resize;
+            splitDatInfoTree.Panel1.Resize += splitDatInfoTree_Panel1_Resize;
             // 
             // splitDatInfoTree.Panel2
             // 
@@ -211,7 +211,7 @@
             // 
             splitGameInfoLists.Panel1.Controls.Add(ctrFilter);
             splitGameInfoLists.Panel1.Controls.Add(ucGameInfo);
-            splitGameInfoLists.Panel1.Resize += splitContainer4_Panel1_Resize;
+            splitGameInfoLists.Panel1.Resize += splitGameInfoLists_Panel1_Resize;
             // 
             // splitGameInfoLists.Panel2
             // 
@@ -447,7 +447,7 @@
             // 
             // helpToolStripMenuItem
             // 
-            helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { torrentZipToolStripMenuItem, visitHelpWikiToolStripMenuItem, colorKeyToolStripMenuItem, whatsNewToolStripMenuItem, aboutRomVaultToolStripMenuItem });
+            helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { torrentZipToolStripMenuItem, colorKeyToolStripMenuItem, visitHelpWikiToolStripMenuItem, whatsNewToolStripMenuItem, aboutRomVaultToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             helpToolStripMenuItem.Text = "Help";
